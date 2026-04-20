@@ -12,7 +12,7 @@
     line-height: 0;
     pointer-events: none;
     user-select: none;
-    z-index: 1;
+    z-index: 5;
     will-change: transform;
     transform: translate3d(-200px, -200px, 0);
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.18));
@@ -74,33 +74,29 @@
     let landed = false;
     const heroRect = () => hero.getBoundingClientRect();
 
-    // The "ground" is the text's baseline — the invisible line the
-    // letters sit on. The bird renders BEHIND the text so it flies
-    // past the letters and comes to rest on the baseline, like a
-    // bird on a branch. This reads more naturally than sampling
-    // per-letter silhouettes.
-    let baselineY = Infinity;
-    const computeBaseline = () => {
-      if (!wall) { baselineY = Infinity; return; }
+    // Compute the cap-height line of the text (top of capital letters).
+    // We use canvas measureText to find ascent-to-cap-top padding so the
+    // bird perches on the visible cap line, not the h1 box top.
+    let capTopY = Infinity;
+    let wallLeft = 0;
+    let wallRight = 0;
+    const computeCapTop = () => {
+      if (!wall) { capTopY = Infinity; return; }
       const h = hero.getBoundingClientRect();
       const wr = wall.getBoundingClientRect();
-      if (wr.width < 1) { baselineY = Infinity; return; }
+      if (wr.width < 1) { capTopY = Infinity; return; }
       const cs = getComputedStyle(wall);
       const canvas = document.createElement('canvas');
-      canvas.width = 1;
-      canvas.height = 1;
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
       ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
-      const m = ctx.measureText('Hg');
-      // Distance from the top of the h1's rendered glyph box down to
-      // the baseline. actualBoundingBoxAscent is measured from the
-      // textBaseline origin; with default baseline 'alphabetic' that
-      // equals the ascent above baseline.
-      const ascent = m.actualBoundingBoxAscent;
-      // The h1 box top aligns with the ascent top for this font-size
-      // + line-height: 1 — same as the canvas metric.
-      baselineY = wr.top - h.top + ascent;
+      const fullAscent = ctx.measureText('Hg').fontBoundingBoxAscent;
+      const capAscent = ctx.measureText('H').actualBoundingBoxAscent;
+      // Top of h1 box is at wr.top; cap top is fullAscent - capAscent below that.
+      const capPadding = Math.max(0, fullAscent - capAscent);
+      capTopY = wr.top - h.top + capPadding;
+      wallLeft = wr.left - h.left;
+      wallRight = wr.right - h.left;
     };
 
     const init = () => {
@@ -110,9 +106,9 @@
     init();
 
     if ((document as any).fonts?.ready) {
-      (document as any).fonts.ready.then(() => computeBaseline());
+      (document as any).fonts.ready.then(() => computeCapTop());
     } else {
-      computeBaseline();
+      computeCapTop();
     }
 
     const flap = () => {
@@ -143,15 +139,18 @@
         if (x > r.width + BIRD_W) x = -BIRD_W;
         if (x < -BIRD_W) x = r.width + BIRD_W;
 
-        // Land on the text's baseline (bird is behind the letters,
-        // so visually it's sitting on the invisible line letters rest on)
-        if (isFinite(baselineY) && vy > 0) {
-          const prevBottom = prevY + feetY;
-          const birdBottom = y + feetY;
-          if (prevBottom <= baselineY && birdBottom >= baselineY) {
-            y = baselineY - feetY;
-            vy = 0;
-            landed = true;
+        // Perch on the cap line when the bird is above the text
+        if (isFinite(capTopY) && vy > 0) {
+          const birdCenter = x + BIRD_W / 2;
+          const overBlock = birdCenter > wallLeft && birdCenter < wallRight;
+          if (overBlock) {
+            const prevBottom = prevY + feetY;
+            const birdBottom = y + feetY;
+            if (prevBottom <= capTopY && birdBottom >= capTopY) {
+              y = capTopY - feetY;
+              vy = 0;
+              landed = true;
+            }
           }
         }
 
@@ -208,7 +207,7 @@
       if (x > r.width) x = r.width - BIRD_W;
       if (y > r.height - BIRD_H) y = r.height - BIRD_H;
       landed = false;
-      computeBaseline();
+      computeCapTop();
     });
   }
 </script>
