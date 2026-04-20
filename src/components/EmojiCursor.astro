@@ -2,6 +2,11 @@
 const EMOJIS = ['🦄', '🐰', '📷', '🤖', '🐠', '🪴'];
 ---
 <script define:vars={{ EMOJIS }}>
+  // Skip setup entirely on touch / small devices — the cursor is hidden
+  // via CSS anyway, no need to burn cycles on the RAF + interval loops.
+  if (matchMedia('(hover: none), (max-width: 760px)').matches) {
+    // no-op
+  } else {
   const cursor = document.createElement('div');
   cursor.className = 'cursor-emoji';
   const inner = document.createElement('span');
@@ -36,6 +41,7 @@ const EMOJIS = ['🦄', '🐰', '📷', '🤖', '🐠', '🪴'];
       );
     };
   }, 1500);
+  }
 </script>
 
 <style is:global>

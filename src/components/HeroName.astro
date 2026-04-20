@@ -198,12 +198,18 @@ const { name = 'Cedrik Lim,' } = Astro.props;
     });
 
     let running = true;
+    let inView = true;
     document.addEventListener('visibilitychange', () => {
       running = document.visibilityState === 'visible';
     });
+    // Pause the RAF loop when the hero scrolls out of view
+    new IntersectionObserver(
+      (entries) => { inView = entries[0]?.isIntersecting ?? true; },
+      { threshold: 0 },
+    ).observe(hero);
 
     const loop = (t: number) => {
-      if (running) {
+      if (running && inView) {
         // Idle re-engages after 1.5s of no input so breathing resumes
         if (!idle && performance.now() - lastInput > 1500 && Math.abs(targetX) < 0.02 && Math.abs(targetY) < 0.02) {
           idle = true;
