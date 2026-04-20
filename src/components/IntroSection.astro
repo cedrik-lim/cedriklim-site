@@ -1,0 +1,153 @@
+---
+---
+<section id="intro" class="snap-section relative flex h-[100svh] items-center justify-center overflow-hidden bg-bg px-6 py-24">
+  <a href="#top" aria-label="Back to top" class="scroll-arrow scroll-arrow--up">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 14 12 8 18 14"></polyline>
+    </svg>
+  </a>
+
+  <a href="#writing" aria-label="To writing" class="scroll-arrow scroll-arrow--down-intro">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 10 12 16 18 10"></polyline>
+    </svg>
+  </a>
+
+  <div class="intro-text serif text-center text-ink">
+    <p class="intro-group">I'm Cedrik.</p>
+
+    <p class="intro-group">
+      I'm building <a href="https://hopper.so" target="_blank" rel="noopener" class="italic intro-link">Hopper</a>, the place creators<br/>
+      teach, sell, and run their communities<br/>
+      without hating the software.
+    </p>
+
+    <p class="intro-group">
+      I write here about what that actually takes.<br/>
+      The Hopper build in public.<br/>
+      The AI tools I make to move faster.<br/>
+      The side projects I build to learn by doing.
+    </p>
+
+    <p class="intro-group">
+      Plants and aquariums, too,<br/>
+      because closed systems teach you patience.<br/>
+      Startups teach you the opposite.
+    </p>
+
+    <p class="intro-signoff italic">From Singapore, with love.</p>
+    <p class="intro-colophon italic">Every line of this, written by AI.</p>
+
+    <div class="intro-socials" aria-label="Social links">
+      <a href="https://www.linkedin.com/in/cedriklim/" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/>
+          <rect x="2" y="9" width="4" height="12"/>
+          <circle cx="4" cy="4" r="2"/>
+        </svg>
+      </a>
+      <a href="https://www.instagram.com/cedriklim/" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5"/>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .intro-text {
+    font-weight: 400;
+    font-size: clamp(20px, 2vw, 28px);
+    line-height: 1.45;
+    letter-spacing: -0.005em;
+    max-width: 880px;
+  }
+  .intro-group {
+    margin: 0 0 1.5em;
+  }
+  .intro-group:last-of-type {
+    margin-bottom: 2em;
+  }
+  .intro-signoff {
+    margin: 0;
+    font-size: 0.95em;
+    opacity: 0.85;
+  }
+  .intro-colophon {
+    margin: 0.5em 0 0;
+    font-size: 0.7em;
+    opacity: 0.45;
+    letter-spacing: 0.01em;
+  }
+  .intro-socials {
+    margin-top: 2.2em;
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+  }
+  .intro-socials a {
+    color: var(--color-ink);
+    opacity: 0.7;
+    transition: opacity 0.25s ease;
+    display: inline-flex;
+  }
+  .intro-socials a:hover { opacity: 1; }
+
+  @media (max-width: 640px) {
+    .intro-text br { display: none; }
+    .intro-group { margin-bottom: 1.2em; }
+  }
+  .intro-link {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 0.05em;
+    transition: opacity 0.25s ease;
+  }
+  .intro-link:hover { opacity: 0.6; }
+
+  .scroll-arrow--up {
+    position: absolute;
+    left: 50%;
+    top: 36px;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 2px solid var(--color-ink);
+    color: var(--color-ink);
+    text-decoration: none;
+    transform: translateX(-50%);
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+  .scroll-arrow--up:hover {
+    background: var(--color-ink);
+    color: var(--color-bg);
+  }
+
+  .scroll-arrow--down-intro {
+    position: absolute;
+    left: 50%;
+    bottom: 36px;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 2px solid var(--color-ink);
+    color: var(--color-ink);
+    text-decoration: none;
+    transform: translateX(-50%);
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+  .scroll-arrow--down-intro:hover {
+    background: var(--color-ink);
+    color: var(--color-bg);
+  }
+</style>

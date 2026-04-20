@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cedrik Lim — Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Figtree:wght@300..700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#f4efe6;
+    --bg-2:#ebe4d6;
+    --ink:#111111;
+    --ink-soft:#3a342c;
+    --muted:#7a7065;
+    --line:#d9cfbe;
+    --peach:#f8cb74;
+    --coral:#fc7d64;
+    --amber:#face6a;
+    --mauve:#735260;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);font-family:'Figtree',sans-serif;font-weight:400;line-height:1.55;-webkit-font-smoothing:antialiased}
+  body{min-height:100vh;overflow-x:hidden}
+  .serif{font-family:'EB Garamond',Georgia,serif;font-weight:500;letter-spacing:-0.01em}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+  nav{position:sticky;top:0;backdrop-filter:blur(14px);background:rgba(244,239,230,.75);border-bottom:1px solid var(--line);z-index:10}
+  nav .row{display:flex;justify-content:space-between;align-items:center;padding:18px 0}
+  nav .brand{font-family:'EB Garamond',serif;font-size:22px;font-weight:600;letter-spacing:-0.02em}
+  nav .brand em{font-style:italic;color:var(--coral)}
+  nav ul{display:flex;gap:28px;list-style:none;font-size:14px}
+  nav a{color:var(--ink-soft);text-decoration:none;transition:color .2s}
+  nav a:hover{color:var(--coral)}
+
+  /* HERO */
+  header.hero{padding:120px 0 100px;position:relative}
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:28px}
+  .eyebrow::before{content:"";width:28px;height:1px;background:var(--ink-soft)}
+  h1.hero-title{font-family:'EB Garamond',serif;font-weight:500;font-size:clamp(56px,9vw,128px);line-height:.95;letter-spacing:-0.03em;margin-bottom:36px}
+  h1 em{font-style:italic;color:var(--coral)}
+  .hero p.lede{font-size:22px;max-width:620px;color:var(--ink-soft);line-height:1.45}
+  .hero .marquee-accent{position:absolute;right:-40px;top:180px;width:260px;height:260px;border-radius:50%;background:var(--peach);filter:blur(60px);opacity:.55;z-index:-1}
+
+  /* TABS */
+  section.posts{padding:80px 0 120px;border-top:1px solid var(--line)}
+  .posts-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px;flex-wrap:wrap;gap:20px}
+  .posts-head h2{font-family:'EB Garamond',serif;font-size:42px;font-weight:500;letter-spacing:-0.02em}
+  .posts-head h2 em{font-style:italic;color:var(--mauve)}
+  .tabs{display:inline-flex;gap:6px;background:var(--bg-2);padding:6px;border-radius:100px;border:1px solid var(--line)}
+  .tabs button{border:0;background:transparent;padding:10px 20px;font-family:'Figtree',sans-serif;font-size:14px;font-weight:500;color:var(--ink-soft);border-radius:100px;cursor:pointer;transition:all .25s cubic-bezier(.2,.8,.2,1);letter-spacing:.01em}
+  .tabs button:hover{color:var(--ink)}
+  .tabs button.active{background:var(--ink);color:var(--bg)}
+
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+  .card{grid-column:span 6;background:var(--bg-2);border:1px solid var(--line);border-radius:20px;overflow:hidden;transition:transform .5s cubic-bezier(.2,.8,.2,1),border-color .3s;cursor:pointer;display:flex;flex-direction:column}
+  .card:hover{transform:translateY(-4px);border-color:var(--ink)}
+  .card .cover{aspect-ratio:16/10;background-size:cover;background-position:center;position:relative;overflow:hidden}
+  .card .cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(0,0,0,.15))}
+  .card .cover.c1{background:linear-gradient(135deg,var(--peach),var(--coral))}
+  .card .cover.c2{background:linear-gradient(135deg,var(--mauve),#af4173)}
+  .card .cover.c3{background:linear-gradient(135deg,var(--amber),var(--peach))}
+  .card .cover.c4{background:linear-gradient(135deg,#2d3e4f,#735260)}
+  .card .body{padding:24px 26px 28px;flex:1;display:flex;flex-direction:column;gap:10px}
+  .card .meta{display:flex;gap:14px;font-size:12px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+  .card .meta .dot{width:4px;height:4px;border-radius:50%;background:var(--muted);align-self:center}
+  .card h3{font-family:'EB Garamond',serif;font-size:28px;font-weight:500;letter-spacing:-0.01em;line-height:1.15}
+  .card p{color:var(--ink-soft);font-size:15px}
+  .card.wide{grid-column:span 12}
+  .card.wide .cover{aspect-ratio:24/9}
+
+  /* ABOUT strip */
+  section.about{padding:100px 0;border-top:1px solid var(--line);background:var(--bg-2)}
+  .about-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+  .about h2{font-family:'EB Garamond',serif;font-size:54px;font-weight:500;line-height:1;letter-spacing:-0.02em;margin-bottom:24px}
+  .about h2 em{font-style:italic;color:var(--coral)}
+  .about p{font-size:17px;color:var(--ink-soft);margin-bottom:16px;max-width:520px}
+  .about .portrait{aspect-ratio:4/5;border-radius:24px;background:linear-gradient(160deg,var(--amber),var(--mauve));position:relative;overflow:hidden}
+
+  footer{padding:60px 0 40px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--muted);flex-wrap:wrap;gap:16px}
+  footer a{color:var(--ink-soft);text-decoration:none;margin-right:20px}
+  footer a:hover{color:var(--coral)}
+
+  @media (max-width:760px){
+    .card{grid-column:span 12}
+    .about-inner{grid-template-columns:1fr}
+    .posts-head{align-items:flex-start}
+  }
+
+  /* subtle entrance */
+  .fade{opacity:0;transform:translateY(20px);animation:rise .9s cubic-bezier(.2,.8,.2,1) forwards}
+  .fade:nth-child(2){animation-delay:.08s}
+  .fade:nth-child(3){animation-delay:.16s}
+  .fade:nth-child(4){animation-delay:.24s}
+  @keyframes rise{to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap row">
+    <div class="brand">Cedrik<em>.</em>Lim</div>
+    <ul>
+      <li><a href="#writing">Writing</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="marquee-accent"></div>
+  <div class="wrap">
+    <div class="eyebrow">Builder · Writer · Tinkerer</div>
+    <h1 class="hero-title">Making things<br/>with <em>care</em> &amp; curiosity.</h1>
+    <p class="lede">I'm Cedrik — a personal corner of the internet where I think out loud about software, design, and the craft of building useful things.</p>
+  </div>
+</header>
+
+<section class="posts" id="writing">
+  <div class="wrap">
+    <div class="posts-head">
+      <h2>Latest <em>posts</em></h2>
+      <div class="tabs" role="tablist">
+        <button class="active" data-tab="all">All</button>
+        <button data-tab="writing">Writing</button>
+        <button data-tab="notes">Notes</button>
+        <button data-tab="projects">Projects</button>
+      </div>
+    </div>
+
+    <div class="grid" id="grid">
+      <article class="card wide fade" data-cat="writing">
+        <div class="cover c1"></div>
+        <div class="body">
+          <div class="meta"><span>Writing</span><span class="dot"></span><span>Apr 2026</span><span class="dot"></span><span>8 min read</span></div>
+          <h3>On the quiet joy of shipping small things</h3>
+          <p>Why tiny, finished projects beat grand unfinished ones — and what I learned from a weekend rewrite.</p>
+        </div>
+      </article>
+
+      <article class="card fade" data-cat="projects">
+        <div class="cover c2"></div>
+        <div class="body">
+          <div class="meta"><span>Project</span><span class="dot"></span><span>Mar 2026</span></div>
+          <h3>A tiny CLI for managing dotfiles</h3>
+          <p>Building a zero-dependency tool in an afternoon.</p>
+        </div>
+      </article>
+
+      <article class="card fade" data-cat="notes">
+        <div class="cover c3"></div>
+        <div class="body">
+          <div class="meta"><span>Note</span><span class="dot"></span><span>Mar 2026</span></div>
+          <h3>Today I learned: CSS anchor positioning</h3>
+          <p>A short note on a new browser feature I'm excited about.</p>
+        </div>
+      </article>
+
+      <article class="card fade" data-cat="writing">
+        <div class="cover c4"></div>
+        <div class="body">
+          <div class="meta"><span>Writing</span><span class="dot"></span><span>Feb 2026</span><span class="dot"></span><span>5 min read</span></div>
+          <h3>Design systems for solo developers</h3>
+          <p>What you actually need (and what you can skip).</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="about" id="about">
+  <div class="wrap about-inner">
+    <div>
+      <h2>A bit <em>about</em> me.</h2>
+      <p>I'm based in [your city]. I spend most days building software, and the rest reading, cooking, and wandering around with a camera.</p>
+      <p>This site is where I share notes-to-self that might also be useful to you. Expect rough edges, strong opinions, and the occasional update.</p>
+    </div>
+    <div class="portrait"></div>
+  </div>
+</section>
+
+<footer class="wrap">
+  <div>&copy; 2026 Cedrik Lim. Built with care.</div>
+  <div>
+    <a href="#">GitHub</a>
+    <a href="#">Twitter</a>
+    <a href="#">RSS</a>
+    <a href="mailto:hi@cedriklim.com">Email</a>
+  </div>
+</footer>
+
+<script>
+  const tabs=document.querySelectorAll('.tabs button');
+  const cards=document.querySelectorAll('#grid .card');
+  tabs.forEach(t=>t.addEventListener('click',()=>{
+    tabs.forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    const cat=t.dataset.tab;
+    cards.forEach(c=>{
+      const show=cat==='all'||c.dataset.cat===cat;
+      c.style.display=show?'flex':'none';
+    });
+  }));
+</script>
+</body>
+</html>

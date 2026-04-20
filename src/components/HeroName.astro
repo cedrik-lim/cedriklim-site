@@ -1,0 +1,90 @@
+---
+interface Props {
+  name?: string;
+}
+const { name = 'Cedrik Lim,' } = Astro.props;
+---
+<section class="hero-name snap-section relative flex h-[100svh] items-center justify-center overflow-hidden bg-bg">
+  <h1 class="hero-word serif text-ink" aria-label={name}>
+    <span class="hero-typed" data-text={name} aria-hidden="true"></span><span class="hero-caret" aria-hidden="true"></span>
+  </h1>
+
+  <a
+    href="#intro"
+    aria-label="Scroll to intro"
+    class="scroll-arrow scroll-arrow--down"
+    data-scroll-arrow="down"
+  >
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 10 12 16 18 10"></polyline>
+    </svg>
+  </a>
+</section>
+
+<style>
+  .hero-word {
+    font-weight: 500;
+    font-size: clamp(56px, 8vw, 128px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin: 0;
+    display: inline-flex;
+    align-items: baseline;
+  }
+  .hero-caret {
+    display: inline-block;
+    width: 0.02em;
+    height: 0.9em;
+    background: currentColor;
+    margin-left: 0.05em;
+    transform: translateY(0.08em);
+    animation: caret-blink 1s steps(2, end) infinite;
+  }
+  @keyframes caret-blink {
+    50% { opacity: 0; }
+  }
+
+  .scroll-arrow {
+    position: absolute;
+    left: 50%;
+    bottom: 36px;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 2px solid var(--color-ink);
+    color: var(--color-ink);
+    text-decoration: none;
+    transform: translateX(-50%);
+    transition: border-color 0.3s ease, background 0.3s ease, color 0.3s ease;
+    animation: arrow-bob 2.2s ease-in-out infinite;
+  }
+  .scroll-arrow:hover {
+    border-color: var(--color-ink);
+    background: var(--color-ink);
+    color: var(--color-bg);
+  }
+  @keyframes arrow-bob {
+    0%, 100% { transform: translate(-50%, 0); }
+    50% { transform: translate(-50%, 6px); }
+  }
+</style>
+
+<script>
+  const el = document.querySelector<HTMLElement>('.hero-typed');
+  if (el) {
+    const text = el.dataset.text ?? '';
+    const chars = [...text];
+    let i = 0;
+    const tick = () => {
+      if (i >= chars.length) return;
+      el.textContent = chars.slice(0, ++i).join('');
+      const next = chars[i - 1];
+      const delay = next === ' ' ? 60 : 90 + Math.random() * 70;
+      setTimeout(tick, delay);
+    };
+    setTimeout(tick, 500);
+  }
+</script>

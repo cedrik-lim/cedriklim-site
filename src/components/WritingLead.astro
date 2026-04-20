@@ -1,0 +1,171 @@
+---
+const text = 'Writings.';
+---
+<section id="writing" class="snap-section relative flex h-[100svh] items-center justify-center overflow-hidden bg-bg px-6">
+  <a href="#intro" aria-label="Back to intro" class="scroll-arrow scroll-arrow--up">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 14 12 8 18 14"></polyline>
+    </svg>
+  </a>
+
+  <a href="/posts" class="writing-link serif text-ink" aria-label={text}>
+    <span class="writing-row">
+      <span class="writing-typed" data-text={text} data-typed="writing" aria-hidden="true"></span><span class="writing-caret" aria-hidden="true"></span>
+      <span class="writing-arrow" aria-hidden="true">👉</span>
+    </span>
+    <span class="writing-hint italic" aria-hidden="true">Read the journal</span>
+  </a>
+</section>
+
+<style>
+  .writing-link {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    font-weight: 500;
+    font-size: clamp(56px, 8vw, 128px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    color: var(--color-ink);
+  }
+  .writing-row {
+    display: inline-flex;
+    align-items: baseline;
+  }
+  .writing-hint {
+    font-size: clamp(15px, 1.3vw, 20px);
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: 0;
+    opacity: 0;
+    color: color-mix(in srgb, var(--color-ink) 60%, transparent);
+    transform: translateY(-4px);
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(.2,.8,.2,1);
+  }
+  .writing-link.is-done .writing-hint {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .writing-caret {
+    display: inline-block;
+    width: 0.02em;
+    height: 0.9em;
+    background: currentColor;
+    margin-left: 0.05em;
+    transform: translateY(0.08em);
+    opacity: 0;
+    animation: none;
+  }
+  .writing-caret.is-on {
+    animation: writing-caret-blink 1s steps(2, end) infinite;
+  }
+  @keyframes writing-caret-blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+
+  .writing-arrow {
+    display: inline-block;
+    margin-left: 0.25em;
+    font-size: 0.55em;
+    line-height: 1;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: opacity 0.5s cubic-bezier(.2,.8,.2,1), transform 0.5s cubic-bezier(.2,.8,.2,1);
+  }
+  .writing-link.is-done .writing-arrow {
+    opacity: 0.7;
+    transform: translateX(0);
+    animation: writing-arrow-nudge 1.8s ease-in-out infinite;
+  }
+  .writing-link.is-done:hover .writing-arrow {
+    opacity: 1;
+    animation: none;
+    transform: translateX(6px);
+  }
+  @keyframes writing-arrow-nudge {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(6px); }
+  }
+
+  .scroll-arrow--up {
+    position: absolute;
+    left: 50%;
+    top: 36px;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 2px solid var(--color-ink);
+    color: var(--color-ink);
+    text-decoration: none;
+    transform: translateX(-50%);
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+  .scroll-arrow--up:hover {
+    background: var(--color-ink);
+    color: var(--color-bg);
+  }
+</style>
+
+<script>
+  const typed = document.querySelector<HTMLElement>('[data-typed="writing"]');
+  const caret = document.querySelector<HTMLElement>('.writing-caret');
+  const link = document.querySelector<HTMLElement>('.writing-link');
+  if (typed && caret && link) {
+    const text = typed.dataset.text ?? '';
+    const chars = [...text];
+
+    let runId = 0;
+    let isRunning = false;
+
+    const play = () => {
+      if (isRunning) return;
+      isRunning = true;
+      const id = ++runId;
+      typed.textContent = '';
+      caret.classList.add('is-on');
+      link.classList.remove('is-done');
+      let i = 0;
+      const tick = () => {
+        if (id !== runId) { isRunning = false; return; }
+        if (i >= chars.length) {
+          isRunning = false;
+          link.classList.add('is-done');
+          return;
+        }
+        typed.textContent = chars.slice(0, ++i).join('');
+        const delay = 90 + Math.random() * 70;
+        setTimeout(tick, delay);
+      };
+      setTimeout(tick, 200);
+    };
+
+    const reset = () => {
+      runId++;
+      isRunning = false;
+      typed.textContent = '';
+      caret.classList.remove('is-on');
+      link.classList.remove('is-done');
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting && e.intersectionRatio > 0.6) {
+            play();
+          } else if (!e.isIntersecting) {
+            reset();
+          }
+        }
+      },
+      { threshold: [0, 0.6, 1] },
+    );
+    io.observe(typed);
+  }
+</script>

@@ -1,0 +1,44 @@
+---
+import '../styles/global.css';
+import EmojiCursor from '../components/EmojiCursor.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const {
+  title = 'Cedrik Lim',
+  description = 'Personal site of Cedrik Lim.',
+} = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <script is:inline>
+      (() => {
+        try {
+          const stored = localStorage.getItem('theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const theme = stored ?? (prefersDark ? 'dark' : 'light');
+          document.documentElement.dataset.theme = theme;
+        } catch {}
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <ThemeToggle />
+    <slot />
+    <EmojiCursor />
+  </body>
+</html>

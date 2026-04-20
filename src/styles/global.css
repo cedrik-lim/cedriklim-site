@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #f4efe6;
+  --color-ink: #111111;
+  --font-serif: 'EB Garamond', Georgia, serif;
+}
+
+html[data-theme="dark"] {
+  --color-bg: #111111;
+  --color-ink: #f4efe6;
+}
+
+html,
+body {
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-serif);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+.snap-section {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.serif {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+@media (max-width: 640px) {
+  .scroll-arrow,
+  .scroll-arrow--up,
+  .scroll-arrow--down-intro {
+    display: none !important;
+  }
+}
