@@ -12,7 +12,7 @@
     line-height: 0;
     pointer-events: none;
     user-select: none;
-    z-index: 5;
+    z-index: 1;
     will-change: transform;
     transform: translate3d(-200px, -200px, 0);
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.18));
@@ -37,10 +37,8 @@
   const FRAMES = ['/flappy/downflap.png', '/flappy/midflap.png', '/flappy/upflap.png', '/flappy/midflap.png'];
   let frameIdx = 1;
   let frameTick = 0;
-  // Bird displayed size (must match CSS)
   const BIRD_DISPLAY_W = 68;
   const BIRD_DISPLAY_H = 48;
-  // Auto-detected feet offset from top of sprite (transparent bottom padding trimmed)
   let feetY = BIRD_DISPLAY_H;
   const probe = new Image();
   probe.src = '/flappy/midflap.png';
@@ -76,50 +74,33 @@
     let landed = false;
     const heroRect = () => hero.getBoundingClientRect();
 
-    // Pixel silhouette of the text so the bird sinks into the crevasses
-    // between letters instead of resting on a flat bounding box.
-    let heightmap: Float32Array | null = null;
-    let mapLeft = 0;
-    let mapTop = 0;
-    const MAP_PAD = 8;
-
-    const buildHeightmap = () => {
-      if (!wall) return;
-      const typed = wall.querySelector<HTMLElement>('.hero-typed');
-      const text = typed?.textContent ?? '';
-      if (!typed || !text) { heightmap = null; return; }
-
+    // The "ground" is the text's baseline — the invisible line the
+    // letters sit on. The bird renders BEHIND the text so it flies
+    // past the letters and comes to rest on the baseline, like a
+    // bird on a branch. This reads more naturally than sampling
+    // per-letter silhouettes.
+    let baselineY = Infinity;
+    const computeBaseline = () => {
+      if (!wall) { baselineY = Infinity; return; }
       const h = hero.getBoundingClientRect();
-      const wr = typed.getBoundingClientRect();
-      if (wr.width < 1 || wr.height < 1) { heightmap = null; return; }
-
+      const wr = wall.getBoundingClientRect();
+      if (wr.width < 1) { baselineY = Infinity; return; }
       const cs = getComputedStyle(wall);
       const canvas = document.createElement('canvas');
-      canvas.width = Math.ceil(wr.width) + MAP_PAD * 2;
-      canvas.height = Math.ceil(wr.height) + MAP_PAD * 2;
-      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      canvas.width = 1;
+      canvas.height = 1;
+      const ctx = canvas.getContext('2d');
       if (!ctx) return;
-
       ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
-      ctx.textBaseline = 'top';
-      ctx.fillStyle = '#000';
-      ctx.fillText(text, MAP_PAD, MAP_PAD);
-
-      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-      const hm = new Float32Array(canvas.width);
-      for (let sx = 0; sx < canvas.width; sx++) {
-        let foundY = Infinity;
-        for (let sy = 0; sy < canvas.height; sy++) {
-          if (data[(sy * canvas.width + sx) * 4 + 3] > 40) {
-            foundY = sy;
-            break;
-          }
-        }
-        hm[sx] = foundY;
-      }
-      heightmap = hm;
-      mapLeft = wr.left - h.left - MAP_PAD;
-      mapTop = wr.top - h.top - MAP_PAD;
+      const m = ctx.measureText('Hg');
+      // Distance from the top of the h1's rendered glyph box down to
+      // the baseline. actualBoundingBoxAscent is measured from the
+      // textBaseline origin; with default baseline 'alphabetic' that
+      // equals the ascent above baseline.
+      const ascent = m.actualBoundingBoxAscent;
+      // The h1 box top aligns with the ascent top for this font-size
+      // + line-height: 1 — same as the canvas metric.
+      baselineY = wr.top - h.top + ascent;
     };
 
     const init = () => {
@@ -129,17 +110,9 @@
     init();
 
     if ((document as any).fonts?.ready) {
-      (document as any).fonts.ready.then(() => buildHeightmap());
+      (document as any).fonts.ready.then(() => computeBaseline());
     } else {
-      buildHeightmap();
-    }
-    const typedEl = wall?.querySelector('.hero-typed');
-    if (typedEl) {
-      new MutationObserver(() => buildHeightmap()).observe(typedEl, {
-        childList: true,
-        characterData: true,
-        subtree: true,
-      });
+      computeBaseline();
     }
 
     const flap = () => {
@@ -170,30 +143,19 @@
         if (x > r.width + BIRD_W) x = -BIRD_W;
         if (x < -BIRD_W) x = r.width + BIRD_W;
 
-        // Sample text silhouette under the bird's feet so it sinks
-        // into crevasses between letters.
-        if (heightmap && vy > 0) {
-          const birdBottom = y + feetY;
+        // Land on the text's baseline (bird is behind the letters,
+        // so visually it's sitting on the invisible line letters rest on)
+        if (isFinite(baselineY) && vy > 0) {
           const prevBottom = prevY + feetY;
-          const feetCenter = x + BIRD_W / 2 - mapLeft;
-          const SAMPLE = 10;
-          let topY = Infinity;
-          for (let sx = Math.floor(feetCenter - SAMPLE); sx <= Math.ceil(feetCenter + SAMPLE); sx++) {
-            if (sx < 0 || sx >= heightmap.length) continue;
-            const v = heightmap[sx];
-            if (v < topY) topY = v;
-          }
-          if (isFinite(topY)) {
-            const groundY = mapTop + topY;
-            if (prevBottom <= groundY && birdBottom >= groundY) {
-              y = groundY - feetY;
-              vy = 0;
-              landed = true;
-            }
+          const birdBottom = y + feetY;
+          if (prevBottom <= baselineY && birdBottom >= baselineY) {
+            y = baselineY - feetY;
+            vy = 0;
+            landed = true;
           }
         }
 
-        // ground — hero bottom
+        // fallback ground — hero bottom
         if (!landed && y > r.height - feetY) {
           y = r.height - feetY;
           vy = 0;
@@ -208,7 +170,6 @@
       const tilt = landed ? 0 : Math.max(-25, Math.min(70, vy * 5));
       bird.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${tilt}deg)`;
 
-      // wing-flap sprite cycle: down → mid → up → mid
       if (img) {
         frameTick++;
         if (frameTick >= 6) {
@@ -247,7 +208,7 @@
       if (x > r.width) x = r.width - BIRD_W;
       if (y > r.height - BIRD_H) y = r.height - BIRD_H;
       landed = false;
-      buildHeightmap();
+      computeBaseline();
     });
   }
 </script>
