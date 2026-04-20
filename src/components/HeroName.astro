@@ -146,6 +146,16 @@ const { name = 'Cedrik Lim,' } = Astro.props;
     setTimeout(tick, 500);
   }
 
+  // Explicit scroll for the hero down-arrow — works around iOS Safari
+  // scroll-snap + anchor-hash navigation bouncing back to the hero.
+  const downArrow = document.querySelector<HTMLAnchorElement>('.hero-name [data-scroll-arrow="down"]');
+  downArrow?.addEventListener('click', (e) => {
+    const target = document.getElementById('intro');
+    if (!target) return;
+    e.preventDefault();
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
   // Cursor-reactive parallax + ambient breathing on the hero
   const hero = document.querySelector<HTMLElement>('[data-hero]');
   const stage = document.querySelector<HTMLElement>('[data-hero-stage]');
