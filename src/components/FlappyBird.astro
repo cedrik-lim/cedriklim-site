@@ -1,14 +1,66 @@
 ---
 ---
-<div class="flappy-bird" data-flappy aria-hidden="true">🐦</div>
+<div class="flappy-bird" data-flappy aria-hidden="true">
+  <svg viewBox="0 0 17 12" width="51" height="36" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">
+    <!-- black outline -->
+    <g fill="#000">
+      <rect x="4" y="0" width="5" height="1"/>
+      <rect x="3" y="1" width="1" height="1"/><rect x="9" y="1" width="3" height="1"/>
+      <rect x="2" y="2" width="1" height="1"/><rect x="12" y="2" width="2" height="1"/>
+      <rect x="1" y="3" width="1" height="1"/><rect x="7" y="3" width="1" height="1"/><rect x="13" y="3" width="1" height="1"/>
+      <rect x="0" y="4" width="1" height="6"/><rect x="7" y="4" width="1" height="1"/>
+      <rect x="11" y="5" width="5" height="1"/>
+      <rect x="11" y="6" width="1" height="1"/><rect x="12" y="7" width="4" height="1"/>
+      <rect x="1" y="8" width="1" height="1"/>
+      <rect x="2" y="9" width="1" height="1"/>
+      <rect x="3" y="10" width="9" height="1"/>
+    </g>
+    <!-- yellow body -->
+    <g fill="#f7d51d">
+      <rect x="4" y="1" width="3" height="1"/>
+      <rect x="3" y="2" width="4" height="1"/>
+      <rect x="2" y="3" width="5" height="1"/>
+      <rect x="1" y="4" width="6" height="1"/><rect x="8" y="4" width="1" height="1"/>
+      <rect x="4" y="5" width="3" height="1"/>
+      <rect x="5" y="6" width="7" height="1"/>
+      <rect x="6" y="7" width="6" height="1"/>
+      <rect x="6" y="8" width="7" height="1"/>
+      <rect x="5" y="9" width="8" height="1"/>
+    </g>
+    <!-- white belly / eye -->
+    <g fill="#fff">
+      <rect x="7" y="1" width="2" height="1"/>
+      <rect x="7" y="2" width="4" height="1"/>
+      <rect x="8" y="3" width="3" height="1"/>
+      <rect x="9" y="4" width="2" height="1"/>
+      <rect x="1" y="5" width="3" height="1"/><rect x="7" y="5" width="3" height="1"/>
+      <rect x="1" y="6" width="1" height="1"/><rect x="4" y="6" width="1" height="1"/>
+      <rect x="1" y="7" width="1" height="1"/><rect x="5" y="7" width="1" height="1"/>
+      <rect x="2" y="8" width="1" height="1"/><rect x="6" y="8" width="1" height="1"/>
+      <rect x="3" y="9" width="2" height="9"/>
+    </g>
+    <!-- orange beak -->
+    <g fill="#f58306">
+      <rect x="11" y="3" width="2" height="1"/>
+      <rect x="11" y="4" width="4" height="1"/>
+      <rect x="10" y="5" width="1" height="1"/>
+      <rect x="12" y="6" width="3" height="1"/>
+    </g>
+    <!-- red wing -->
+    <g fill="#e04a3c">
+      <rect x="2" y="6" width="2" height="1"/>
+      <rect x="2" y="7" width="3" height="1"/>
+      <rect x="3" y="8" width="3" height="1"/>
+    </g>
+  </svg>
+</div>
 
 <style>
   .flappy-bird {
     position: absolute;
     top: 0;
     left: 0;
-    font-size: 36px;
-    line-height: 1;
+    line-height: 0;
     pointer-events: none;
     user-select: none;
     z-index: 5;
@@ -16,13 +68,21 @@
     transform: translate3d(-200px, -200px, 0);
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.18));
   }
+  .flappy-bird svg {
+    display: block;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+  }
 </style>
 
 <script>
   const bird = document.querySelector<HTMLElement>('[data-flappy]');
   const hero = document.querySelector<HTMLElement>('.hero-name');
+  const wall = document.querySelector<HTMLElement>('.hero-word');
   if (bird && hero) {
-    const BIRD_W = 40;
+    const BIRD_W = 51;
+    const BIRD_H = 36;
     const GRAVITY = 0.45;
     const FLAP = -9;
     const DRIFT = 1.2;
@@ -31,16 +91,28 @@
     let x = 80;
     let y = 0;
     let vy = 0;
-    const rect = () => hero.getBoundingClientRect();
+    let landed = false;
+    const heroRect = () => hero.getBoundingClientRect();
+    const wallRect = () => {
+      if (!wall) return null;
+      const h = hero.getBoundingClientRect();
+      const w = wall.getBoundingClientRect();
+      return {
+        left: w.left - h.left,
+        right: w.right - h.left,
+        top: w.top - h.top,
+      };
+    };
 
     const init = () => {
-      const r = rect();
-      y = r.height * 0.35;
+      const r = heroRect();
+      y = r.height * 0.25;
     };
     init();
 
     const flap = () => {
       vy = FLAP;
+      landed = false;
     };
 
     hero.addEventListener('click', (e) => {
@@ -55,25 +127,44 @@
 
     const step = () => {
       if (!running) return;
-      const r = rect();
-      vy = Math.min(vy + GRAVITY, MAX_VY);
-      y += vy;
-      x += DRIFT;
+      const r = heroRect();
 
-      if (x > r.width + BIRD_W) x = -BIRD_W;
-      if (x < -BIRD_W) x = r.width + BIRD_W;
+      if (!landed) {
+        vy = Math.min(vy + GRAVITY, MAX_VY);
+        const prevY = y;
+        y += vy;
+        x += DRIFT;
 
-      if (y > r.height - BIRD_W) {
-        y = r.height - BIRD_W;
-        vy = -Math.abs(vy) * 0.35;
-        if (Math.abs(vy) < 1.5) vy = -5;
+        if (x > r.width + BIRD_W) x = -BIRD_W;
+        if (x < -BIRD_W) x = r.width + BIRD_W;
+
+        // name acts as a wall — land on top of it
+        const w = wallRect();
+        if (w && vy > 0) {
+          const birdRight = x + BIRD_W;
+          const birdBottom = y + BIRD_H;
+          const prevBottom = prevY + BIRD_H;
+          const overlapsX = birdRight > w.left + 4 && x < w.right - 4;
+          if (overlapsX && prevBottom <= w.top && birdBottom >= w.top) {
+            y = w.top - BIRD_H;
+            vy = 0;
+            landed = true;
+          }
+        }
+
+        // ground — hero bottom
+        if (!landed && y > r.height - BIRD_H) {
+          y = r.height - BIRD_H;
+          vy = 0;
+          landed = true;
+        }
+        if (y < 0) {
+          y = 0;
+          vy = 1;
+        }
       }
-      if (y < 0) {
-        y = 0;
-        vy = 1;
-      }
 
-      const tilt = Math.max(-25, Math.min(70, vy * 5));
+      const tilt = landed ? 0 : Math.max(-25, Math.min(70, vy * 5));
       bird.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${tilt}deg)`;
       rafId = requestAnimationFrame(step);
     };
@@ -100,9 +191,10 @@
     io.observe(hero);
 
     window.addEventListener('resize', () => {
-      const r = rect();
+      const r = heroRect();
       if (x > r.width) x = r.width - BIRD_W;
-      if (y > r.height - BIRD_W) y = r.height - BIRD_W;
+      if (y > r.height - BIRD_H) y = r.height - BIRD_H;
+      landed = false;
     });
   }
 </script>
