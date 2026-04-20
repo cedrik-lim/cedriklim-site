@@ -1,10 +1,13 @@
 ---
+import FlappyBird from './FlappyBird.astro';
 interface Props {
   name?: string;
 }
 const { name = 'Cedrik Lim,' } = Astro.props;
 ---
 <section class="hero-name snap-section relative flex h-[100svh] items-center justify-center overflow-hidden bg-bg">
+  <FlappyBird />
+
   <h1 class="hero-word serif text-ink" aria-label={name}>
     <span class="hero-typed" data-text={name} aria-hidden="true"></span><span class="hero-caret" aria-hidden="true"></span>
   </h1>

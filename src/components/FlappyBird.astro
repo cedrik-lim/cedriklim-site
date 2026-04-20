@@ -1,0 +1,108 @@
+---
+---
+<div class="flappy-bird" data-flappy aria-hidden="true">🐦</div>
+
+<style>
+  .flappy-bird {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 36px;
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+    z-index: 5;
+    will-change: transform;
+    transform: translate3d(-200px, -200px, 0);
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.18));
+  }
+</style>
+
+<script>
+  const bird = document.querySelector<HTMLElement>('[data-flappy]');
+  const hero = document.querySelector<HTMLElement>('.hero-name');
+  if (bird && hero) {
+    const BIRD_W = 40;
+    const GRAVITY = 0.45;
+    const FLAP = -9;
+    const DRIFT = 1.2;
+    const MAX_VY = 12;
+
+    let x = 80;
+    let y = 0;
+    let vy = 0;
+    const rect = () => hero.getBoundingClientRect();
+
+    const init = () => {
+      const r = rect();
+      y = r.height * 0.35;
+    };
+    init();
+
+    const flap = () => {
+      vy = FLAP;
+    };
+
+    hero.addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      if (t.closest('.scroll-arrow')) return;
+      flap();
+    });
+    hero.style.cursor = 'pointer';
+
+    let rafId = 0;
+    let running = false;
+
+    const step = () => {
+      if (!running) return;
+      const r = rect();
+      vy = Math.min(vy + GRAVITY, MAX_VY);
+      y += vy;
+      x += DRIFT;
+
+      if (x > r.width + BIRD_W) x = -BIRD_W;
+      if (x < -BIRD_W) x = r.width + BIRD_W;
+
+      if (y > r.height - BIRD_W) {
+        y = r.height - BIRD_W;
+        vy = -Math.abs(vy) * 0.35;
+        if (Math.abs(vy) < 1.5) vy = -5;
+      }
+      if (y < 0) {
+        y = 0;
+        vy = 1;
+      }
+
+      const tilt = Math.max(-25, Math.min(70, vy * 5));
+      bird.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${tilt}deg)`;
+      rafId = requestAnimationFrame(step);
+    };
+
+    const start = () => {
+      if (running) return;
+      running = true;
+      rafId = requestAnimationFrame(step);
+    };
+    const stop = () => {
+      running = false;
+      cancelAnimationFrame(rafId);
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting && e.intersectionRatio > 0.3) start();
+          else stop();
+        }
+      },
+      { threshold: [0, 0.3, 1] },
+    );
+    io.observe(hero);
+
+    window.addEventListener('resize', () => {
+      const r = rect();
+      if (x > r.width) x = r.width - BIRD_W;
+      if (y > r.height - BIRD_W) y = r.height - BIRD_W;
+    });
+  }
+</script>
