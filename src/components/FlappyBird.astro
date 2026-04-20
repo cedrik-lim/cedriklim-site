@@ -37,6 +37,30 @@
   const FRAMES = ['/flappy/downflap.png', '/flappy/midflap.png', '/flappy/upflap.png', '/flappy/midflap.png'];
   let frameIdx = 1;
   let frameTick = 0;
+  // Bird displayed size (must match CSS)
+  const BIRD_DISPLAY_W = 68;
+  const BIRD_DISPLAY_H = 48;
+  // Auto-detected feet offset from top of sprite (transparent bottom padding trimmed)
+  let feetY = BIRD_DISPLAY_H;
+  const probe = new Image();
+  probe.src = '/flappy/midflap.png';
+  probe.onload = () => {
+    const c = document.createElement('canvas');
+    c.width = BIRD_DISPLAY_W;
+    c.height = BIRD_DISPLAY_H;
+    const cx = c.getContext('2d', { willReadFrequently: true });
+    if (!cx) return;
+    cx.imageSmoothingEnabled = false;
+    cx.drawImage(probe, 0, 0, BIRD_DISPLAY_W, BIRD_DISPLAY_H);
+    const d = cx.getImageData(0, 0, BIRD_DISPLAY_W, BIRD_DISPLAY_H).data;
+    for (let yy = BIRD_DISPLAY_H - 1; yy >= 0; yy--) {
+      let hit = false;
+      for (let xx = 0; xx < BIRD_DISPLAY_W; xx++) {
+        if (d[(yy * BIRD_DISPLAY_W + xx) * 4 + 3] > 40) { hit = true; break; }
+      }
+      if (hit) { feetY = yy + 1; break; }
+    }
+  };
   FRAMES.forEach((src) => { const i = new Image(); i.src = src; });
   if (bird && hero) {
     const BIRD_W = 68;
@@ -149,10 +173,8 @@
         // Sample text silhouette under the bird's feet so it sinks
         // into crevasses between letters.
         if (heightmap && vy > 0) {
-          const birdBottom = y + BIRD_H;
-          const prevBottom = prevY + BIRD_H;
-          // Sample a narrow window around the bird's center so a gap
-          // wider than the window drops through; a letter edge catches it.
+          const birdBottom = y + feetY;
+          const prevBottom = prevY + feetY;
           const feetCenter = x + BIRD_W / 2 - mapLeft;
           const SAMPLE = 10;
           let topY = Infinity;
@@ -164,7 +186,7 @@
           if (isFinite(topY)) {
             const groundY = mapTop + topY;
             if (prevBottom <= groundY && birdBottom >= groundY) {
-              y = groundY - BIRD_H;
+              y = groundY - feetY;
               vy = 0;
               landed = true;
             }
@@ -172,8 +194,8 @@
         }
 
         // ground — hero bottom
-        if (!landed && y > r.height - BIRD_H) {
-          y = r.height - BIRD_H;
+        if (!landed && y > r.height - feetY) {
+          y = r.height - feetY;
           vy = 0;
           landed = true;
         }
