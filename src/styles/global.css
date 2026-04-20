@@ -45,7 +45,6 @@ body {
 }
 
 @media (max-width: 640px) {
-  .scroll-arrow,
   .scroll-arrow--up,
   .scroll-arrow--down-intro {
     display: none !important;
