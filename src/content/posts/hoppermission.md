@@ -1,6 +1,6 @@
 ---
 title: The Hopper Mission.
-date: 2026-04-18
+date: 2026-04-22
 cover: https://picsum.photos/seed/cedriklim-quiet/1200/1500
 excerpt: If it isn't a joy, it isn't finished.
 ---
