@@ -1,5 +1,5 @@
 ---
-title: Daniel saved $5,000 a year.
+title: Daniel saved more than $5,000 a year.
 date: 2026-05-02
 cover: /covers/daniel.jpg
 excerpt: One coach. One platform. 89% savings.
