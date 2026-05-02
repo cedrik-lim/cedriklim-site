@@ -6,13 +6,7 @@ interface Props {
 const { name = 'Cedrik Lim,' } = Astro.props;
 ---
 <section class="hero-name snap-section relative flex h-[100svh] items-center justify-center overflow-hidden bg-bg" data-hero>
-  <a href="/posts" class="hero-nav" aria-label="Writings">
-    <span>Writings</span>
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <line x1="5" y1="12" x2="19" y2="12"></line>
-      <polyline points="13 6 19 12 13 18"></polyline>
-    </svg>
-  </a>
+  <a href="/posts" class="hero-nav">Writings</a>
 
   <FlappyBird />
 
@@ -58,17 +52,8 @@ const { name = 'Cedrik Lim,' } = Astro.props;
     color: color-mix(in srgb, var(--color-ink) 60%, transparent);
     transition: color 0.25s ease, transform 0.25s cubic-bezier(.2,.8,.2,1);
   }
-  .hero-nav svg {
-    transform: translateX(0);
-    transition: transform 0.3s cubic-bezier(.2,.8,.2,1);
-    opacity: 0.7;
-  }
   .hero-nav:hover {
     color: var(--color-ink);
-  }
-  .hero-nav:hover svg {
-    transform: translateX(4px);
-    opacity: 1;
   }
   @media (max-width: 640px) {
     .hero-nav { display: none; }
