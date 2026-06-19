@@ -1,0 +1,427 @@
+---
+// Curated country code list. Tweak as needed.
+const COUNTRY_CODES: { code: string; flag: string; name: string }[] = [
+  { code: '+65',  flag: '🇸🇬', name: 'Singapore' },
+  { code: '+60',  flag: '🇲🇾', name: 'Malaysia' },
+  { code: '+62',  flag: '🇮🇩', name: 'Indonesia' },
+  { code: '+66',  flag: '🇹🇭', name: 'Thailand' },
+  { code: '+63',  flag: '🇵🇭', name: 'Philippines' },
+  { code: '+84',  flag: '🇻🇳', name: 'Vietnam' },
+  { code: '+852', flag: '🇭🇰', name: 'Hong Kong' },
+  { code: '+853', flag: '🇲🇴', name: 'Macau' },
+  { code: '+886', flag: '🇹🇼', name: 'Taiwan' },
+  { code: '+86',  flag: '🇨🇳', name: 'China' },
+  { code: '+81',  flag: '🇯🇵', name: 'Japan' },
+  { code: '+82',  flag: '🇰🇷', name: 'South Korea' },
+  { code: '+91',  flag: '🇮🇳', name: 'India' },
+  { code: '+61',  flag: '🇦🇺', name: 'Australia' },
+  { code: '+64',  flag: '🇳🇿', name: 'New Zealand' },
+  { code: '+1',   flag: '🇺🇸', name: 'United States' },
+  { code: '+1',   flag: '🇨🇦', name: 'Canada' },
+  { code: '+44',  flag: '🇬🇧', name: 'United Kingdom' },
+  { code: '+353', flag: '🇮🇪', name: 'Ireland' },
+  { code: '+49',  flag: '🇩🇪', name: 'Germany' },
+  { code: '+33',  flag: '🇫🇷', name: 'France' },
+  { code: '+34',  flag: '🇪🇸', name: 'Spain' },
+  { code: '+39',  flag: '🇮🇹', name: 'Italy' },
+  { code: '+31',  flag: '🇳🇱', name: 'Netherlands' },
+  { code: '+41',  flag: '🇨🇭', name: 'Switzerland' },
+  { code: '+46',  flag: '🇸🇪', name: 'Sweden' },
+  { code: '+47',  flag: '🇳🇴', name: 'Norway' },
+  { code: '+45',  flag: '🇩🇰', name: 'Denmark' },
+  { code: '+358', flag: '🇫🇮', name: 'Finland' },
+  { code: '+351', flag: '🇵🇹', name: 'Portugal' },
+  { code: '+30',  flag: '🇬🇷', name: 'Greece' },
+  { code: '+90',  flag: '🇹🇷', name: 'Turkey' },
+  { code: '+971', flag: '🇦🇪', name: 'UAE' },
+  { code: '+972', flag: '🇮🇱', name: 'Israel' },
+  { code: '+966', flag: '🇸🇦', name: 'Saudi Arabia' },
+  { code: '+27',  flag: '🇿🇦', name: 'South Africa' },
+  { code: '+234', flag: '🇳🇬', name: 'Nigeria' },
+  { code: '+254', flag: '🇰🇪', name: 'Kenya' },
+  { code: '+20',  flag: '🇪🇬', name: 'Egypt' },
+  { code: '+55',  flag: '🇧🇷', name: 'Brazil' },
+  { code: '+52',  flag: '🇲🇽', name: 'Mexico' },
+  { code: '+54',  flag: '🇦🇷', name: 'Argentina' },
+];
+---
+<div class="reachout-modal" data-reachout-modal hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="reachout-title">
+  <div class="reachout-backdrop" data-reachout-close></div>
+
+  <div class="reachout-card" role="document">
+    <button type="button" class="reachout-close" aria-label="Close" data-reachout-close>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="6" y1="6" x2="18" y2="18"/>
+        <line x1="6" y1="18" x2="18" y2="6"/>
+      </svg>
+    </button>
+
+    <div class="reachout-body" data-reachout-body>
+      <h2 id="reachout-title" class="reachout-title serif">Let's work together.</h2>
+      <p class="reachout-sub italic">Drop your details — I'll be in touch.</p>
+
+      <form class="reachout-form" data-reachout-form novalidate>
+        <label class="reachout-field">
+          <span class="reachout-label">Name</span>
+          <input type="text" name="name" required autocomplete="name" />
+        </label>
+
+        <label class="reachout-field">
+          <span class="reachout-label">Email</span>
+          <input type="email" name="email" required autocomplete="email" />
+        </label>
+
+        <div class="reachout-field">
+          <span class="reachout-label">Phone</span>
+          <div class="reachout-phone">
+            <select name="countryCode" aria-label="Country code" required>
+              {COUNTRY_CODES.map((c) => (
+                <option value={c.code} selected={c.code === '+65'}>
+                  {c.flag} {c.code} {c.name}
+                </option>
+              ))}
+            </select>
+            <input type="tel" name="phone" required autocomplete="tel" inputmode="numeric" pattern="[0-9 \-]*" placeholder="Number" />
+          </div>
+        </div>
+
+        <label class="reachout-field">
+          <span class="reachout-label">What are you working on? <em>(optional)</em></span>
+          <textarea name="message" rows="3"></textarea>
+        </label>
+
+        <button type="submit" class="reachout-submit" data-reachout-submit>
+          <span>Send</span>
+        </button>
+
+        <p class="reachout-error" data-reachout-error hidden></p>
+      </form>
+    </div>
+
+    <div class="reachout-success" data-reachout-success hidden>
+      <div class="reachout-check" aria-hidden="true">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <h2 class="reachout-title serif">Got it.</h2>
+      <p class="reachout-sub italic">I'll reach out within a day or two.</p>
+      <button type="button" class="reachout-done" data-reachout-close>Close</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .reachout-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .reachout-modal[hidden] { display: none; }
+
+  .reachout-backdrop {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--color-bg) 80%, transparent);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    animation: ro-fade 0.3s ease both;
+  }
+
+  .reachout-card {
+    position: relative;
+    width: min(440px, 100%);
+    max-height: calc(100svh - 48px);
+    overflow-y: auto;
+    background: var(--color-bg);
+    color: var(--color-ink);
+    border: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+    border-radius: 18px;
+    box-shadow: 0 30px 80px -20px color-mix(in srgb, var(--color-ink) 30%, transparent);
+    padding: 36px 30px 30px;
+    animation: ro-pop 0.35s cubic-bezier(.2,.8,.2,1) both;
+  }
+
+  @keyframes ro-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes ro-pop {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .reachout-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border: none;
+    background: transparent;
+    color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  .reachout-close:hover {
+    background: color-mix(in srgb, var(--color-ink) 8%, transparent);
+    color: var(--color-ink);
+  }
+
+  .reachout-title {
+    margin: 0;
+    font-weight: 500;
+    font-size: clamp(28px, 3vw, 36px);
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    text-align: center;
+  }
+  .reachout-sub {
+    margin: 8px 0 0;
+    text-align: center;
+    font-size: 14px;
+    opacity: 0.55;
+  }
+
+  .reachout-form {
+    margin-top: 26px;
+    display: grid;
+    gap: 16px;
+  }
+  .reachout-field {
+    display: grid;
+    gap: 6px;
+  }
+  .reachout-label {
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.55;
+  }
+  .reachout-label em {
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0;
+    opacity: 0.7;
+  }
+
+  .reachout-form input,
+  .reachout-form select,
+  .reachout-form textarea {
+    width: 100%;
+    font: inherit;
+    font-family: var(--font-serif);
+    font-size: 16px;
+    color: var(--color-ink);
+    background: color-mix(in srgb, var(--color-ink) 4%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+    border-radius: 10px;
+    padding: 11px 13px;
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    outline: none;
+  }
+  .reachout-form textarea {
+    resize: vertical;
+    min-height: 76px;
+  }
+  .reachout-form input:focus,
+  .reachout-form select:focus,
+  .reachout-form textarea:focus {
+    border-color: color-mix(in srgb, var(--color-ink) 35%, transparent);
+    background: color-mix(in srgb, var(--color-ink) 2%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ink) 8%, transparent);
+  }
+
+  .reachout-phone {
+    display: grid;
+    grid-template-columns: minmax(110px, 38%) 1fr;
+    gap: 8px;
+  }
+  .reachout-phone select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 28px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+  }
+
+  .reachout-submit {
+    margin-top: 8px;
+    width: 100%;
+    padding: 13px 16px;
+    border: none;
+    border-radius: 999px;
+    background: var(--color-ink);
+    color: var(--color-bg);
+    font: inherit;
+    font-family: var(--font-serif);
+    font-size: 15px;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+  }
+  .reachout-submit:hover { opacity: 0.85; }
+  .reachout-submit:active { transform: scale(0.98); }
+  .reachout-submit[disabled] {
+    opacity: 0.55;
+    cursor: progress;
+  }
+
+  .reachout-error {
+    margin: 0;
+    color: #c14a3a;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  .reachout-success {
+    text-align: center;
+    padding: 8px 0 4px;
+  }
+  .reachout-check {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 16px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-ink) 8%, transparent);
+    color: var(--color-ink);
+    display: grid;
+    place-items: center;
+    animation: ro-pop 0.4s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .reachout-done {
+    margin: 22px auto 0;
+    display: block;
+    padding: 10px 22px;
+    background: transparent;
+    border: 1px solid color-mix(in srgb, var(--color-ink) 25%, transparent);
+    border-radius: 999px;
+    color: var(--color-ink);
+    font: inherit;
+    font-family: var(--font-serif);
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .reachout-done:hover {
+    background: var(--color-ink);
+    color: var(--color-bg);
+  }
+
+  @media (max-width: 480px) {
+    .reachout-card { padding: 32px 22px 26px; border-radius: 16px; }
+    .reachout-phone { grid-template-columns: minmax(96px, 40%) 1fr; }
+  }
+</style>
+
+<script>
+  // Where form submissions are POSTed as JSON.
+  // Replace with your Google Apps Script Web App URL (deploy as web app, "Anyone" access)
+  // once you've set up the WhatsApp ping. For now, submissions just resolve locally so
+  // the UI is fully testable.
+  const FORM_ENDPOINT = '';
+
+  const modal   = document.querySelector<HTMLElement>('[data-reachout-modal]');
+  const form    = document.querySelector<HTMLFormElement>('[data-reachout-form]');
+  const body    = document.querySelector<HTMLElement>('[data-reachout-body]');
+  const success = document.querySelector<HTMLElement>('[data-reachout-success]');
+  const errorEl = document.querySelector<HTMLElement>('[data-reachout-error]');
+  const submitBtn = document.querySelector<HTMLButtonElement>('[data-reachout-submit]');
+
+  const open = () => {
+    if (!modal) return;
+    modal.hidden = false;
+    modal.setAttribute('aria-hidden', 'false');
+    document.documentElement.style.overflow = 'hidden';
+    setTimeout(() => {
+      const firstInput = modal.querySelector<HTMLInputElement>('input[name="name"]');
+      firstInput?.focus();
+    }, 50);
+  };
+  const close = () => {
+    if (!modal) return;
+    modal.hidden = true;
+    modal.setAttribute('aria-hidden', 'true');
+    document.documentElement.style.overflow = '';
+    // Reset to form view for next open
+    setTimeout(() => {
+      if (body && success) { body.hidden = false; success.hidden = true; }
+      form?.reset();
+      if (errorEl) { errorEl.hidden = true; errorEl.textContent = ''; }
+    }, 250);
+  };
+
+  document.querySelectorAll('[data-reachout-open]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      open();
+    });
+  });
+  document.querySelectorAll('[data-reachout-close]').forEach((el) => {
+    el.addEventListener('click', close);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal && !modal.hidden) close();
+  });
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const data = new FormData(form);
+    const payload = {
+      name:        String(data.get('name')        ?? '').trim(),
+      email:       String(data.get('email')       ?? '').trim(),
+      countryCode: String(data.get('countryCode') ?? '').trim(),
+      phone:       String(data.get('phone')       ?? '').trim(),
+      message:     String(data.get('message')     ?? '').trim(),
+      source:      'cedriklim.com/reach-out',
+      submittedAt: new Date().toISOString(),
+    };
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.querySelector('span')!.textContent = 'Sending…';
+    }
+    if (errorEl) { errorEl.hidden = true; errorEl.textContent = ''; }
+
+    try {
+      if (FORM_ENDPOINT) {
+        const res = await fetch(FORM_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      } else {
+        // No endpoint configured yet — log and simulate success so the UI is testable.
+        console.log('[reach-out] form submission (no endpoint configured):', payload);
+        await new Promise((r) => setTimeout(r, 500));
+      }
+      if (body && success) { body.hidden = true; success.hidden = false; }
+    } catch (err) {
+      if (errorEl) {
+        errorEl.textContent = 'Something went wrong. Please try again or email hello@cedriklim.com.';
+        errorEl.hidden = false;
+      }
+      console.error('[reach-out] submit failed', err);
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.querySelector('span')!.textContent = 'Send';
+      }
+    }
+  });
+</script>

@@ -1,4 +1,5 @@
 ---
+import ReachOutModal from './ReachOutModal.astro';
 ---
 <section id="intro" class="snap-section relative flex h-[100svh] items-center justify-center overflow-hidden bg-bg px-6 py-24">
   <a href="#top" aria-label="Back to top" class="scroll-arrow scroll-arrow--up">
@@ -38,6 +39,14 @@
     <p class="intro-signoff italic">From Singapore, with love.</p>
     <p class="intro-colophon italic">Every line of this, written by AI.</p>
 
+    <button type="button" class="intro-reachout" data-reachout-open>
+      <span>Reach out</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="5" y1="12" x2="19" y2="12"/>
+        <polyline points="13 6 19 12 13 18"/>
+      </svg>
+    </button>
+
     <div class="intro-socials" aria-label="Social links">
       <a href="https://www.linkedin.com/in/cedriklim/" target="_blank" rel="noopener" aria-label="LinkedIn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
@@ -60,6 +69,8 @@
       </a>
     </div>
   </div>
+
+  <ReachOutModal />
 </section>
 
 <style>
@@ -87,8 +98,43 @@
     opacity: 0.45;
     letter-spacing: 0.01em;
   }
+  .intro-reachout {
+    margin-top: 1.8em;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 22px 11px 24px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--color-ink) 22%, transparent);
+    background: transparent;
+    color: var(--color-ink);
+    font: inherit;
+    font-family: var(--font-serif);
+    font-size: 15px;
+    letter-spacing: 0.005em;
+    cursor: pointer;
+    transition: background 0.25s ease, color 0.25s ease, transform 0.15s ease, border-color 0.25s ease;
+  }
+  .intro-reachout svg {
+    transform: translateX(0);
+    transition: transform 0.3s cubic-bezier(.2,.8,.2,1);
+    opacity: 0.8;
+  }
+  .intro-reachout:hover {
+    background: var(--color-ink);
+    color: var(--color-bg);
+    border-color: var(--color-ink);
+  }
+  .intro-reachout:hover svg {
+    transform: translateX(3px);
+    opacity: 1;
+  }
+  .intro-reachout:active {
+    transform: scale(0.98);
+  }
+
   .intro-socials {
-    margin-top: 2.2em;
+    margin-top: 1.6em;
     display: flex;
     justify-content: center;
     gap: 22px;
