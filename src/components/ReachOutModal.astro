@@ -74,13 +74,32 @@ const COUNTRY_CODES: { code: string; flag: string; name: string }[] = [
         <div class="reachout-field">
           <span class="reachout-label">Phone</span>
           <div class="reachout-phone">
-            <select name="countryCode" aria-label="Country code" required>
-              {COUNTRY_CODES.map((c) => (
-                <option value={c.code} selected={c.code === '+65'}>
-                  {c.flag} {c.code} {c.name}
-                </option>
-              ))}
-            </select>
+            <div class="reachout-cc" data-cc-root>
+              <input type="hidden" name="countryCode" value="+65" data-cc-input />
+              <button type="button" class="reachout-cc-trigger" data-cc-trigger aria-haspopup="listbox" aria-expanded="false" aria-label="Country code">
+                <span class="reachout-cc-flag" data-cc-flag>🇸🇬</span>
+                <span class="reachout-cc-code" data-cc-code>+65</span>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </button>
+              <ul class="reachout-cc-list" role="listbox" data-cc-list hidden>
+                {COUNTRY_CODES.map((c) => (
+                  <li
+                    role="option"
+                    class="reachout-cc-item"
+                    data-code={c.code}
+                    data-flag={c.flag}
+                    data-name={c.name}
+                    tabindex="-1"
+                  >
+                    <span class="reachout-cc-item-flag">{c.flag}</span>
+                    <span class="reachout-cc-item-code">{c.code}</span>
+                    <span class="reachout-cc-item-name">{c.name}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
             <input type="tel" name="phone" required autocomplete="tel" inputmode="numeric" pattern="[0-9 \-]*" placeholder="Number" />
           </div>
         </div>
@@ -241,18 +260,92 @@ const COUNTRY_CODES: { code: string; flag: string; name: string }[] = [
 
   .reachout-phone {
     display: grid;
-    grid-template-columns: minmax(110px, 38%) 1fr;
+    grid-template-columns: 112px 1fr;
     gap: 8px;
   }
-  .reachout-phone select {
-    appearance: none;
-    -webkit-appearance: none;
-    padding-right: 28px;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 12px;
+
+  .reachout-cc { position: relative; }
+  .reachout-cc-trigger {
+    width: 100%;
+    height: 100%;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 10px 0 13px;
+    background: color-mix(in srgb, var(--color-ink) 4%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+    border-radius: 10px;
+    color: var(--color-ink);
+    font: inherit;
+    font-family: var(--font-serif);
+    font-size: 16px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    outline: none;
   }
+  .reachout-cc-trigger:hover {
+    border-color: color-mix(in srgb, var(--color-ink) 22%, transparent);
+  }
+  .reachout-cc-trigger:focus-visible,
+  .reachout-cc[data-open] .reachout-cc-trigger {
+    border-color: color-mix(in srgb, var(--color-ink) 35%, transparent);
+    background: color-mix(in srgb, var(--color-ink) 2%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ink) 8%, transparent);
+  }
+  .reachout-cc-flag { font-size: 18px; line-height: 1; }
+  .reachout-cc-code { font-size: 15px; flex: 1; text-align: left; }
+  .reachout-cc-trigger svg {
+    opacity: 0.6;
+    transition: transform 0.2s ease;
+  }
+  .reachout-cc[data-open] .reachout-cc-trigger svg {
+    transform: rotate(180deg);
+  }
+
+  .reachout-cc-list {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 10;
+    width: max-content;
+    max-width: min(280px, 90vw);
+    max-height: 260px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    background: var(--color-bg);
+    border: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+    border-radius: 12px;
+    box-shadow: 0 16px 40px -12px color-mix(in srgb, var(--color-ink) 30%, transparent);
+    animation: ro-pop 0.18s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .reachout-cc-list[hidden] { display: none; }
+  .reachout-cc-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1.2;
+    color: var(--color-ink);
+    user-select: none;
+    transition: background 0.15s ease;
+  }
+  .reachout-cc-item:hover,
+  .reachout-cc-item[aria-selected="true"] {
+    background: color-mix(in srgb, var(--color-ink) 7%, transparent);
+  }
+  .reachout-cc-item-flag { font-size: 17px; line-height: 1; }
+  .reachout-cc-item-code {
+    font-variant-numeric: tabular-nums;
+    opacity: 0.7;
+    min-width: 42px;
+  }
+  .reachout-cc-item-name { flex: 1; }
 
   .reachout-submit {
     margin-top: 8px;
@@ -359,6 +452,56 @@ const COUNTRY_CODES: { code: string; flag: string; name: string }[] = [
       if (errorEl) { errorEl.hidden = true; errorEl.textContent = ''; }
     }, 250);
   };
+
+  // Custom country-code dropdown
+  const ccRoot    = document.querySelector<HTMLElement>('[data-cc-root]');
+  const ccTrigger = document.querySelector<HTMLButtonElement>('[data-cc-trigger]');
+  const ccList    = document.querySelector<HTMLElement>('[data-cc-list]');
+  const ccInput   = document.querySelector<HTMLInputElement>('[data-cc-input]');
+  const ccFlag    = document.querySelector<HTMLElement>('[data-cc-flag]');
+  const ccCode    = document.querySelector<HTMLElement>('[data-cc-code]');
+
+  const ccOpen = () => {
+    if (!ccRoot || !ccList || !ccTrigger) return;
+    ccRoot.setAttribute('data-open', '');
+    ccList.hidden = false;
+    ccTrigger.setAttribute('aria-expanded', 'true');
+    const sel = ccList.querySelector<HTMLElement>(`[data-code="${ccInput?.value}"]`);
+    sel?.scrollIntoView({ block: 'nearest' });
+  };
+  const ccClose = () => {
+    if (!ccRoot || !ccList || !ccTrigger) return;
+    ccRoot.removeAttribute('data-open');
+    ccList.hidden = true;
+    ccTrigger.setAttribute('aria-expanded', 'false');
+  };
+  const ccSelect = (item: HTMLElement) => {
+    const code = item.dataset.code ?? '';
+    const flag = item.dataset.flag ?? '';
+    if (ccInput) ccInput.value = code;
+    if (ccCode)  ccCode.textContent = code;
+    if (ccFlag)  ccFlag.textContent = flag;
+    ccList?.querySelectorAll('[aria-selected="true"]').forEach((n) => n.removeAttribute('aria-selected'));
+    item.setAttribute('aria-selected', 'true');
+    ccClose();
+  };
+
+  ccTrigger?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (ccRoot?.hasAttribute('data-open')) ccClose(); else ccOpen();
+  });
+  ccList?.addEventListener('click', (e) => {
+    const item = (e.target as HTMLElement).closest<HTMLElement>('.reachout-cc-item');
+    if (item) ccSelect(item);
+  });
+  document.addEventListener('click', (e) => {
+    if (ccRoot && !ccRoot.contains(e.target as Node)) ccClose();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && ccRoot?.hasAttribute('data-open')) ccClose();
+  });
+  // mark default option as selected
+  ccList?.querySelector<HTMLElement>(`[data-code="${ccInput?.value}"]`)?.setAttribute('aria-selected', 'true');
 
   document.querySelectorAll('[data-reachout-open]').forEach((el) => {
     el.addEventListener('click', (e) => {
