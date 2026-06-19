@@ -39,9 +39,15 @@ import ReachOutModal from './ReachOutModal.astro';
     <p class="intro-signoff italic">From Singapore, with love.</p>
     <p class="intro-colophon italic">Every line of this, written by AI.</p>
 
-    <button type="button" class="intro-reachout" data-reachout-open>
-      Reach out
-    </button>
+    <span class="intro-reachout-wrap">
+      <button type="button" class="intro-reachout" data-reachout-open>
+        Reach out
+      </button>
+      <svg class="reachout-spark reachout-spark--1" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L13.7 10.3L24 12L13.7 13.7L12 24L10.3 13.7L0 12L10.3 10.3Z"/></svg>
+      <svg class="reachout-spark reachout-spark--2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L13.7 10.3L24 12L13.7 13.7L12 24L10.3 13.7L0 12L10.3 10.3Z"/></svg>
+      <svg class="reachout-spark reachout-spark--3" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L13.7 10.3L24 12L13.7 13.7L12 24L10.3 13.7L0 12L10.3 10.3Z"/></svg>
+      <svg class="reachout-spark reachout-spark--4" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L13.7 10.3L24 12L13.7 13.7L12 24L10.3 13.7L0 12L10.3 10.3Z"/></svg>
+    </span>
 
     <div class="intro-socials" aria-label="Social links">
       <a href="https://www.linkedin.com/in/cedriklim/" target="_blank" rel="noopener" aria-label="LinkedIn">
@@ -94,8 +100,13 @@ import ReachOutModal from './ReachOutModal.astro';
     opacity: 0.45;
     letter-spacing: 0.01em;
   }
-  .intro-reachout {
+  .intro-reachout-wrap {
+    position: relative;
+    display: inline-block;
     margin-top: 1.8em;
+  }
+  .intro-reachout {
+    position: relative;
     display: inline-block;
     padding: 11px 24px;
     border-radius: 999px;
@@ -107,6 +118,7 @@ import ReachOutModal from './ReachOutModal.astro';
     font-size: 15px;
     letter-spacing: 0.005em;
     cursor: pointer;
+    z-index: 1;
     transition: background 0.25s ease, color 0.25s ease, transform 0.15s ease, border-color 0.25s ease;
   }
   .intro-reachout:hover {
@@ -116,6 +128,55 @@ import ReachOutModal from './ReachOutModal.astro';
   }
   .intro-reachout:active {
     transform: scale(0.98);
+  }
+
+  .reachout-spark {
+    position: absolute;
+    fill: var(--color-ink);
+    pointer-events: none;
+    opacity: 0;
+    will-change: transform, opacity;
+    animation: spark-twinkle 2.8s ease-in-out infinite;
+  }
+  .reachout-spark--1 {
+    width: 12px;
+    height: 12px;
+    top: -6px;
+    left: -10px;
+    animation-delay: 0s;
+  }
+  .reachout-spark--2 {
+    width: 8px;
+    height: 8px;
+    top: -2px;
+    right: -4px;
+    animation-delay: 0.7s;
+  }
+  .reachout-spark--3 {
+    width: 10px;
+    height: 10px;
+    bottom: -8px;
+    right: 18%;
+    animation-delay: 1.4s;
+  }
+  .reachout-spark--4 {
+    width: 7px;
+    height: 7px;
+    bottom: 0;
+    left: -2px;
+    animation-delay: 2.1s;
+  }
+  .intro-reachout-wrap:hover .reachout-spark {
+    animation-duration: 1.4s;
+  }
+  @keyframes spark-twinkle {
+    0%, 100% { opacity: 0; transform: scale(0.3) rotate(0deg); }
+    40%      { opacity: 0.9; transform: scale(1) rotate(90deg); }
+    60%      { opacity: 0.7; transform: scale(0.95) rotate(135deg); }
+    80%      { opacity: 0; transform: scale(0.3) rotate(180deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reachout-spark { animation: none; opacity: 0; }
   }
 
   .intro-socials {
