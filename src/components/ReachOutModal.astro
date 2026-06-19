@@ -163,6 +163,22 @@ const COUNTRY_CODES: { code: string; flag: string; name: string }[] = [
     box-shadow: 0 30px 80px -20px color-mix(in srgb, var(--color-ink) 30%, transparent);
     padding: 36px 30px 30px;
     animation: ro-pop 0.35s cubic-bezier(.2,.8,.2,1) both;
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-ink) 18%, transparent) transparent;
+  }
+  .reachout-card::-webkit-scrollbar {
+    width: 6px;
+  }
+  .reachout-card::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .reachout-card::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--color-ink) 18%, transparent);
+    border-radius: 999px;
+  }
+  .reachout-card::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--color-ink) 32%, transparent);
   }
 
   @keyframes ro-fade {
@@ -320,6 +336,17 @@ const COUNTRY_CODES: { code: string; flag: string; name: string }[] = [
     border-radius: 12px;
     box-shadow: 0 16px 40px -12px color-mix(in srgb, var(--color-ink) 30%, transparent);
     animation: ro-pop 0.18s cubic-bezier(.2,.8,.2,1) both;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-ink) 18%, transparent) transparent;
+  }
+  .reachout-cc-list::-webkit-scrollbar { width: 6px; }
+  .reachout-cc-list::-webkit-scrollbar-track { background: transparent; }
+  .reachout-cc-list::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--color-ink) 18%, transparent);
+    border-radius: 999px;
+  }
+  .reachout-cc-list::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--color-ink) 32%, transparent);
   }
   .reachout-cc-list[hidden] { display: none; }
   .reachout-cc-item {
