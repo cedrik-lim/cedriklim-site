@@ -43,10 +43,10 @@ import ReachOutModal from './ReachOutModal.astro';
       <button type="button" class="intro-reachout" data-reachout-open>
         Reach out
       </button>
-      <svg class="reachout-spark reachout-spark--1" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L13.7 10.3L24 12L13.7 13.7L12 24L10.3 13.7L0 12L10.3 10.3Z"/></svg>
-      <svg class="reachout-spark reachout-spark--2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L13.7 10.3L24 12L13.7 13.7L12 24L10.3 13.7L0 12L10.3 10.3Z"/></svg>
-      <svg class="reachout-spark reachout-spark--3" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L13.7 10.3L24 12L13.7 13.7L12 24L10.3 13.7L0 12L10.3 10.3Z"/></svg>
-      <svg class="reachout-spark reachout-spark--4" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0L13.7 10.3L24 12L13.7 13.7L12 24L10.3 13.7L0 12L10.3 10.3Z"/></svg>
+      <span class="reachout-spark reachout-spark--1" aria-hidden="true">✨</span>
+      <span class="reachout-spark reachout-spark--2" aria-hidden="true">✨</span>
+      <span class="reachout-spark reachout-spark--3" aria-hidden="true">✨</span>
+      <span class="reachout-spark reachout-spark--4" aria-hidden="true">✨</span>
     </span>
 
     <div class="intro-socials" aria-label="Social links">
@@ -132,38 +132,35 @@ import ReachOutModal from './ReachOutModal.astro';
 
   .reachout-spark {
     position: absolute;
-    fill: var(--color-ink);
     pointer-events: none;
     opacity: 0;
+    line-height: 1;
+    user-select: none;
     will-change: transform, opacity;
     animation: spark-twinkle 2.8s ease-in-out infinite;
   }
   .reachout-spark--1 {
-    width: 12px;
-    height: 12px;
-    top: -6px;
-    left: -10px;
+    font-size: 16px;
+    top: -10px;
+    left: -14px;
     animation-delay: 0s;
   }
   .reachout-spark--2 {
-    width: 8px;
-    height: 8px;
-    top: -2px;
-    right: -4px;
+    font-size: 11px;
+    top: -4px;
+    right: -8px;
     animation-delay: 0.7s;
   }
   .reachout-spark--3 {
-    width: 10px;
-    height: 10px;
-    bottom: -8px;
+    font-size: 14px;
+    bottom: -12px;
     right: 18%;
     animation-delay: 1.4s;
   }
   .reachout-spark--4 {
-    width: 7px;
-    height: 7px;
-    bottom: 0;
-    left: -2px;
+    font-size: 10px;
+    bottom: -2px;
+    left: -4px;
     animation-delay: 2.1s;
   }
   .intro-reachout-wrap:hover .reachout-spark {
