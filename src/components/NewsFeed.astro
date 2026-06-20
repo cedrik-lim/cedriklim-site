@@ -208,6 +208,35 @@
   // Keywords that must appear (case-insensitive) for a story to count as AI news.
   const AI_KEYWORDS = /\b(AI|A\.I\.|AGI|ASI|LLM|LLMs|GPT|GPTs|ChatGPT|Claude|Anthropic|OpenAI|Gemini|DeepMind|DeepSeek|Mistral|Llama|Grok|RAG|MCP|fine[- ]?tuning|machine learning|deep learning|neural network|transformer|diffusion|generative|inference|embedding|prompt(?: engineering)?|reasoning model|agentic?|copilot|tokenization|nvidia|cuda|hugging[- ]?face|stable diffusion|midjourney|sora|dall-?e)\b/i;
 
+  // Only stories from these domains (or their subdomains) appear in the feed.
+  const TRUSTED = new Set([
+    // Major news
+    'nytimes.com', 'wsj.com', 'ft.com', 'bloomberg.com', 'reuters.com',
+    'bbc.com', 'bbc.co.uk', 'apnews.com', 'theguardian.com', 'economist.com',
+    'washingtonpost.com', 'theatlantic.com', 'newyorker.com',
+    // Tech press
+    'techcrunch.com', 'theverge.com', 'arstechnica.com', 'wired.com',
+    'cnbc.com', 'venturebeat.com', 'engadget.com', 'cnet.com', 'zdnet.com',
+    '404media.co', 'platformer.news', 'stratechery.com', 'theinformation.com',
+    'semafor.com', 'axios.com', 'vox.com',
+    // AI labs and big-tech blogs
+    'openai.com', 'anthropic.com', 'deepmind.google', 'deepmind.com',
+    'blog.google', 'ai.google', 'research.google', 'ai.googleblog.com',
+    'ai.meta.com', 'about.fb.com', 'microsoft.com', 'blogs.microsoft.com',
+    'nvidia.com', 'blogs.nvidia.com', 'apple.com', 'machinelearning.apple.com',
+    'huggingface.co',
+    // Research
+    'arxiv.org', 'nature.com', 'science.org', 'mit.edu', 'stanford.edu',
+    'spectrum.ieee.org', 'distill.pub',
+  ]);
+
+  const isTrusted = (host: string) => {
+    if (!host) return false;
+    if (TRUSTED.has(host)) return true;
+    for (const t of TRUSTED) if (host.endsWith('.' + t)) return true;
+    return false;
+  };
+
   const formatAge = (sec: number) => {
     const diff = Math.max(0, Date.now() / 1000 - sec);
     if (diff < 60) return 'just now';
@@ -277,10 +306,10 @@
       // Hacker News Algolia API — CORS-friendly, no auth.
       // search_by_date sorted by recency; query catches the major AI terms,
       // then we client-side filter to AI-related titles only.
-      // Fire a couple of queries in parallel for coverage (Algolia doesn't
+      // Fire several queries in parallel for coverage (Algolia doesn't
       // support OR in a single query). Then merge + dedupe + client-side filter.
       const fetchQuery = (q: string) => fetch(
-        `https://hn.algolia.com/api/v1/search_by_date?query=${encodeURIComponent(q)}&tags=story&hitsPerPage=60`,
+        `https://hn.algolia.com/api/v1/search_by_date?query=${encodeURIComponent(q)}&tags=story&hitsPerPage=100`,
         { cache: 'no-store' },
       ).then((r) => r.ok ? r.json() : { hits: [] });
 
@@ -288,13 +317,14 @@
         fetchQuery('AI'),
         fetchQuery('LLM'),
         fetchQuery('OpenAI'),
+        fetchQuery('Anthropic'),
+        fetchQuery('GPT'),
       ]);
       const allHits = responses.flatMap((j: any) => j?.hits ?? []);
 
       const seen = new Set<string>();
       const items: Story[] = allHits
         .filter((h: any) => h?.title && AI_KEYWORDS.test(h.title))
-        .sort((a: any, b: any) => (b.created_at_i ?? 0) - (a.created_at_i ?? 0))
         .map((h: any) => {
           const u = h.url || `https://news.ycombinator.com/item?id=${h.objectID}`;
           const host = safeDomain(u) || 'news.ycombinator.com';
@@ -306,6 +336,8 @@
             createdAt: h.created_at_i ?? 0,
           } as Story;
         })
+        .filter((s: Story) => isTrusted(s.domain))
+        .sort((a: Story, b: Story) => b.createdAt - a.createdAt)
         .filter((s: Story) => {
           const key = s.url;
           if (seen.has(key)) return false;
