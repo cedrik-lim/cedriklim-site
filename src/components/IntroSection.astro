@@ -15,7 +15,7 @@ import ReachOutModal from './ReachOutModal.astro';
   </a>
 
   <div class="intro-text serif text-center text-ink">
-    <p class="intro-group">I'm Cedrik.</p>
+    <p class="intro-group">I'm <span class="intro-name" data-secret-name>Cedrik</span>.</p>
 
     <p class="intro-group">
       I'm building <a href="https://hopper.so" target="_blank" rel="noopener" class="italic intro-link">Hopper</a>, the place creators<br/>
@@ -73,7 +73,95 @@ import ReachOutModal from './ReachOutModal.astro';
   </div>
 
   <ReachOutModal />
+
+  <div class="secret-player" data-secret-player hidden aria-hidden="true">
+    <button type="button" class="secret-player-btn" data-secret-toggle aria-label="Pause">
+      <svg class="secret-player-icon secret-player-icon--pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <rect x="6" y="5" width="4" height="14" rx="1"/>
+        <rect x="14" y="5" width="4" height="14" rx="1"/>
+      </svg>
+      <svg class="secret-player-icon secret-player-icon--play" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+    </button>
+    <div class="secret-player-meta">
+      <div class="secret-player-title">LP Liew Chant</div>
+      <div class="secret-player-sub italic">on repeat · close to dismiss</div>
+    </div>
+    <button type="button" class="secret-player-close" data-secret-close aria-label="Close">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="6" y1="6" x2="18" y2="18"/>
+        <line x1="6" y1="18" x2="18" y2="6"/>
+      </svg>
+    </button>
+    <audio data-secret-audio src="/audio/lp-liew-chant.m4a" loop preload="none"></audio>
+  </div>
 </section>
+
+<script>
+  const trigger = document.querySelector<HTMLElement>('[data-secret-name]');
+  const player  = document.querySelector<HTMLElement>('[data-secret-player]');
+  const audio   = document.querySelector<HTMLAudioElement>('[data-secret-audio]');
+  const toggle  = document.querySelector<HTMLButtonElement>('[data-secret-toggle]');
+  const closeBtn = document.querySelector<HTMLButtonElement>('[data-secret-close]');
+
+  if (trigger && player && audio && toggle && closeBtn) {
+    let count = 0;
+    let lastClick = 0;
+    const RESET_MS = 2000;
+    const NEEDED = 10;
+
+    const openPlayer = () => {
+      player.hidden = false;
+      player.setAttribute('aria-hidden', 'false');
+      requestAnimationFrame(() => player.setAttribute('data-open', ''));
+      audio.play().then(() => {
+        toggle.setAttribute('aria-label', 'Pause');
+        player.setAttribute('data-playing', '');
+      }).catch(() => {
+        toggle.setAttribute('aria-label', 'Play');
+        player.removeAttribute('data-playing');
+      });
+    };
+
+    const closePlayer = () => {
+      audio.pause();
+      audio.currentTime = 0;
+      player.removeAttribute('data-open');
+      player.removeAttribute('data-playing');
+      setTimeout(() => {
+        player.hidden = true;
+        player.setAttribute('aria-hidden', 'true');
+      }, 250);
+      count = 0;
+    };
+
+    trigger.addEventListener('click', () => {
+      const now = Date.now();
+      if (now - lastClick > RESET_MS) count = 0;
+      lastClick = now;
+      count += 1;
+      if (count >= NEEDED) {
+        count = 0;
+        openPlayer();
+      }
+    });
+
+    toggle.addEventListener('click', () => {
+      if (audio.paused) {
+        audio.play();
+        toggle.setAttribute('aria-label', 'Pause');
+        player.setAttribute('data-playing', '');
+      } else {
+        audio.pause();
+        toggle.setAttribute('aria-label', 'Play');
+        player.removeAttribute('data-playing');
+      }
+    });
+
+    closeBtn.addEventListener('click', closePlayer);
+  }
+</script>
 
 <style>
   .intro-text {
@@ -202,6 +290,91 @@ import ReachOutModal from './ReachOutModal.astro';
     transition: opacity 0.25s ease;
   }
   .intro-link:hover { opacity: 0.6; }
+
+  .intro-name {
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .secret-player {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px 10px 10px;
+    background: color-mix(in srgb, var(--color-bg) 92%, transparent);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+    border-radius: 999px;
+    box-shadow: 0 18px 50px -16px rgba(0, 0, 0, 0.35);
+    color: var(--color-ink);
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.25s cubic-bezier(.2,.8,.2,1);
+    pointer-events: none;
+  }
+  .secret-player[data-open] {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+  }
+  .secret-player-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: none;
+    background: var(--color-ink);
+    color: var(--color-bg);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: transform 0.15s ease;
+  }
+  .secret-player-btn:active { transform: scale(0.95); }
+  .secret-player-icon { display: none; }
+  .secret-player[data-playing] .secret-player-icon--pause { display: block; }
+  .secret-player:not([data-playing]) .secret-player-icon--play { display: block; padding-left: 2px; }
+  .secret-player-meta {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+    padding-right: 4px;
+  }
+  .secret-player-title {
+    font-family: var(--font-serif);
+    font-size: 13px;
+    letter-spacing: -0.005em;
+  }
+  .secret-player-sub {
+    font-family: var(--font-serif);
+    font-size: 10.5px;
+    opacity: 0.55;
+    letter-spacing: 0.01em;
+  }
+  .secret-player-close {
+    border: none;
+    background: transparent;
+    color: var(--color-ink);
+    opacity: 0.45;
+    cursor: pointer;
+    padding: 6px;
+    margin: -6px -2px -6px 0;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    transition: opacity 0.2s ease, background 0.2s ease;
+  }
+  .secret-player-close:hover {
+    opacity: 1;
+    background: color-mix(in srgb, var(--color-ink) 7%, transparent);
+  }
 
   .scroll-arrow--up,
   .scroll-arrow--down-intro {
