@@ -3,7 +3,7 @@
 <aside class="newsfeed" data-newsfeed aria-label="Latest news">
   <header class="newsfeed-head">
     <span class="newsfeed-dot" aria-hidden="true"></span>
-    <span class="newsfeed-title">Latest news</span>
+    <span class="newsfeed-title">Latest in AI</span>
     <button type="button" class="newsfeed-refresh" data-newsfeed-refresh aria-label="Refresh">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <polyline points="23 4 23 10 17 10"/>
@@ -17,7 +17,7 @@
   </ul>
 </aside>
 
-<style>
+<style is:global>
   .newsfeed {
     position: fixed;
     bottom: 24px;
@@ -95,11 +95,14 @@
   .newsfeed-list {
     list-style: none;
     margin: 0;
-    padding: 4px 0;
-    max-height: calc(8 * 72px);
+    padding: 0;
+    max-height: calc(8 * 68px);
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: color-mix(in srgb, var(--color-ink) 18%, transparent) transparent;
+  }
+  .newsfeed-list > li + li .newsfeed-item {
+    border-top: 1px solid color-mix(in srgb, var(--color-ink) 6%, transparent);
   }
   .newsfeed-list::-webkit-scrollbar { width: 6px; }
   .newsfeed-list::-webkit-scrollbar-track { background: transparent; }
@@ -121,38 +124,42 @@
 
   .newsfeed-item {
     display: flex;
-    gap: 10px;
-    padding: 10px 14px;
+    gap: 12px;
+    padding: 12px 16px;
     text-decoration: none;
     color: inherit;
-    transition: background 0.15s ease;
+    transition: background 0.18s ease;
   }
   .newsfeed-item:hover {
     background: color-mix(in srgb, var(--color-ink) 5%, transparent);
   }
   .newsfeed-thumb {
-    width: 38px;
-    height: 38px;
+    width: 32px;
+    height: 32px;
     flex-shrink: 0;
-    border-radius: 8px;
-    background: color-mix(in srgb, var(--color-ink) 7%, transparent);
-    object-fit: contain;
-    padding: 7px;
+    border-radius: 7px;
+    background: transparent;
+    object-fit: cover;
     display: block;
-    align-self: center;
+    align-self: flex-start;
+    margin-top: 2px;
+    transition: transform 0.25s cubic-bezier(.2,.8,.2,1);
+  }
+  .newsfeed-item:hover .newsfeed-thumb {
+    transform: scale(1.04);
   }
   .newsfeed-text {
     flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 3px;
+    gap: 4px;
   }
   .newsfeed-text-title {
-    font-size: 13px;
-    line-height: 1.3;
+    font-size: 13.5px;
+    line-height: 1.35;
     font-weight: 500;
+    letter-spacing: -0.005em;
     color: var(--color-ink);
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -161,11 +168,24 @@
   }
   .newsfeed-text-meta {
     font-size: 11px;
-    color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+    color: color-mix(in srgb, var(--color-ink) 50%, transparent);
     font-style: italic;
+    letter-spacing: 0.01em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  .newsfeed-text-meta-sep {
+    display: inline-block;
+    width: 2px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+    opacity: 0.6;
+    flex-shrink: 0;
   }
 
   @media (max-width: 900px) {
@@ -174,11 +194,27 @@
 </style>
 
 <script>
-  type Story = { title: string; url: string; domain: string; faviconUrl: string };
+  type Story = {
+    title: string;
+    url: string;
+    domain: string;
+    faviconUrl: string;
+    createdAt: number; // unix seconds
+  };
 
   const list    = document.querySelector<HTMLElement>('[data-newsfeed-list]');
   const refresh = document.querySelector<HTMLButtonElement>('[data-newsfeed-refresh]');
   const TARGET_COUNT = 30;
+  // Keywords that must appear (case-insensitive) for a story to count as AI news.
+  const AI_KEYWORDS = /\b(AI|A\.I\.|AGI|ASI|LLM|LLMs|GPT|GPTs|ChatGPT|Claude|Anthropic|OpenAI|Gemini|DeepMind|DeepSeek|Mistral|Llama|Grok|RAG|MCP|fine[- ]?tuning|machine learning|deep learning|neural network|transformer|diffusion|generative|inference|embedding|prompt(?: engineering)?|reasoning model|agentic?|copilot|tokenization|nvidia|cuda|hugging[- ]?face|stable diffusion|midjourney|sora|dall-?e)\b/i;
+
+  const formatAge = (sec: number) => {
+    const diff = Math.max(0, Date.now() / 1000 - sec);
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return Math.round(diff / 60) + 'm ago';
+    if (diff < 86400) return Math.round(diff / 3600) + 'h ago';
+    return Math.round(diff / 86400) + 'd ago';
+  };
 
   const setState = (text: string) => {
     if (!list) return;
@@ -207,8 +243,7 @@
 
       const img = document.createElement('img');
       img.className = 'newsfeed-thumb';
-      img.loading = 'lazy';
-      img.referrerPolicy = 'no-referrer';
+      img.decoding = 'async';
       img.src = item.faviconUrl;
       img.alt = '';
       img.onerror = () => { img.style.visibility = 'hidden'; };
@@ -221,7 +256,13 @@
       title.textContent = item.title;
       const meta = document.createElement('div');
       meta.className = 'newsfeed-text-meta';
-      meta.textContent = item.domain;
+      const metaDomain = document.createElement('span');
+      metaDomain.textContent = item.domain;
+      const metaSep = document.createElement('span');
+      metaSep.className = 'newsfeed-text-meta-sep';
+      const metaAge = document.createElement('span');
+      metaAge.textContent = formatAge(item.createdAt);
+      meta.append(metaDomain, metaSep, metaAge);
       text.append(title, meta);
       a.appendChild(text);
 
@@ -233,26 +274,47 @@
   const load = async () => {
     if (refresh) refresh.dataset.spinning = '';
     try {
-      // Hacker News Algolia API — CORS-friendly, no auth, 30 latest front-page stories.
-      const res = await fetch(
-        `https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=${TARGET_COUNT}`,
+      // Hacker News Algolia API — CORS-friendly, no auth.
+      // search_by_date sorted by recency; query catches the major AI terms,
+      // then we client-side filter to AI-related titles only.
+      // Fire a couple of queries in parallel for coverage (Algolia doesn't
+      // support OR in a single query). Then merge + dedupe + client-side filter.
+      const fetchQuery = (q: string) => fetch(
+        `https://hn.algolia.com/api/v1/search_by_date?query=${encodeURIComponent(q)}&tags=story&hitsPerPage=60`,
         { cache: 'no-store' },
-      );
-      if (!res.ok) throw new Error('hn ' + res.status);
-      const json = await res.json();
-      const items: Story[] = (json?.hits ?? [])
-        .filter((h: any) => h?.title)
+      ).then((r) => r.ok ? r.json() : { hits: [] });
+
+      const responses = await Promise.all([
+        fetchQuery('AI'),
+        fetchQuery('LLM'),
+        fetchQuery('OpenAI'),
+      ]);
+      const allHits = responses.flatMap((j: any) => j?.hits ?? []);
+
+      const seen = new Set<string>();
+      const items: Story[] = allHits
+        .filter((h: any) => h?.title && AI_KEYWORDS.test(h.title))
+        .sort((a: any, b: any) => (b.created_at_i ?? 0) - (a.created_at_i ?? 0))
         .map((h: any) => {
-          const url = h.url || `https://news.ycombinator.com/item?id=${h.objectID}`;
-          const host = safeDomain(url) || 'news.ycombinator.com';
+          const u = h.url || `https://news.ycombinator.com/item?id=${h.objectID}`;
+          const host = safeDomain(u) || 'news.ycombinator.com';
           return {
             title: h.title as string,
-            url,
+            url: u,
             domain: host,
             faviconUrl: `https://www.google.com/s2/favicons?sz=64&domain=${host}`,
-          };
-        });
-      if (!items.length) { setState('Could not load news.'); return; }
+            createdAt: h.created_at_i ?? 0,
+          } as Story;
+        })
+        .filter((s: Story) => {
+          const key = s.url;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        })
+        .slice(0, TARGET_COUNT);
+
+      if (!items.length) { setState('No AI news right now.'); return; }
       renderItems(items);
     } catch (err) {
       console.error(err);
