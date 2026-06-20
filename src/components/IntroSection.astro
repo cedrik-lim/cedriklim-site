@@ -203,45 +203,35 @@ import ReachOutModal from './ReachOutModal.astro';
   }
   .intro-link:hover { opacity: 0.6; }
 
-  .scroll-arrow--up {
-    position: absolute;
-    left: 50%;
-    top: 36px;
-    width: 52px;
-    height: 52px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 999px;
-    border: 2px solid var(--color-ink);
-    color: var(--color-ink);
-    text-decoration: none;
-    transform: translateX(-50%);
-    transition: background 0.3s ease, color 0.3s ease;
-  }
-  .scroll-arrow--up:hover {
-    background: var(--color-ink);
-    color: var(--color-bg);
-  }
-
+  .scroll-arrow--up,
   .scroll-arrow--down-intro {
     position: absolute;
-    left: 50%;
-    bottom: 36px;
-    width: 52px;
-    height: 52px;
+    left: max(24px, env(safe-area-inset-left));
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 999px;
-    border: 2px solid var(--color-ink);
-    color: var(--color-ink);
+    border: 1px solid color-mix(in srgb, var(--color-ink) 25%, transparent);
+    color: color-mix(in srgb, var(--color-ink) 70%, transparent);
     text-decoration: none;
-    transform: translateX(-50%);
-    transition: background 0.3s ease, color 0.3s ease;
+    background: color-mix(in srgb, var(--color-bg) 60%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
   }
+  .scroll-arrow--up { top: 50%; transform: translateY(-50%) translateY(-32px); }
+  .scroll-arrow--down-intro { top: 50%; transform: translateY(-50%) translateY(32px); }
+  .scroll-arrow--up:hover,
   .scroll-arrow--down-intro:hover {
     background: var(--color-ink);
     color: var(--color-bg);
+    border-color: var(--color-ink);
+  }
+  .scroll-arrow--up svg,
+  .scroll-arrow--down-intro svg {
+    width: 16px;
+    height: 16px;
   }
 </style>
