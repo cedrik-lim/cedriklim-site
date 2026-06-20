@@ -229,44 +229,62 @@ const { name = 'Cedrik Lim,' } = Astro.props;
       targetX = 0; targetY = 0;
     });
 
+    let rafId = 0;
     let running = true;
     let inView = true;
+
+    const loop = (t: number) => {
+      // Idle re-engages after 1.5s of no input so breathing resumes
+      if (!idle && performance.now() - lastInput > 1500 && Math.abs(targetX) < 0.02 && Math.abs(targetY) < 0.02) {
+        idle = true;
+      }
+
+      curX += (targetX - curX) * 0.08;
+      curY += (targetY - curY) * 0.08;
+
+      // Ambient breathing — tiny pulse when idle
+      const breath = idle ? Math.sin(t / 3200) : 0;
+      const breathScale = 1 + breath * 0.006;
+      const breathY = breath * 2;
+
+      // Parallax tilt (subtle — Apple-level means 4-6deg max)
+      const rotY = curX * 5;
+      const rotX = -curY * 4;
+      const tz = (Math.abs(curX) + Math.abs(curY)) * 8;
+
+      stage.style.transform =
+        `translate3d(${curX * -6}px, ${curY * -4 + breathY * 0.3}px, 0) ` +
+        `rotateY(${rotY}deg) rotateX(${rotX}deg) translateZ(${tz}px)`;
+      word.style.transform = `scale(${breathScale})`;
+
+      rafId = requestAnimationFrame(loop);
+    };
+
+    const start = () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(loop);
+    };
+    const stop = () => {
+      if (!rafId) return;
+      cancelAnimationFrame(rafId);
+      rafId = 0;
+    };
+
     document.addEventListener('visibilitychange', () => {
       running = document.visibilityState === 'visible';
+      if (running && inView) start();
+      else stop();
     });
     // Pause the RAF loop when the hero scrolls out of view
     new IntersectionObserver(
-      (entries) => { inView = entries[0]?.isIntersecting ?? true; },
+      (entries) => {
+        inView = entries[0]?.isIntersecting ?? true;
+        if (running && inView) start();
+        else stop();
+      },
       { threshold: 0 },
     ).observe(hero);
 
-    const loop = (t: number) => {
-      if (running && inView) {
-        // Idle re-engages after 1.5s of no input so breathing resumes
-        if (!idle && performance.now() - lastInput > 1500 && Math.abs(targetX) < 0.02 && Math.abs(targetY) < 0.02) {
-          idle = true;
-        }
-
-        curX += (targetX - curX) * 0.08;
-        curY += (targetY - curY) * 0.08;
-
-        // Ambient breathing — tiny pulse when idle
-        const breath = idle ? Math.sin(t / 3200) : 0;
-        const breathScale = 1 + breath * 0.006;
-        const breathY = breath * 2;
-
-        // Parallax tilt (subtle — Apple-level means 4-6deg max)
-        const rotY = curX * 5;
-        const rotX = -curY * 4;
-        const tz = (Math.abs(curX) + Math.abs(curY)) * 8;
-
-        stage.style.transform =
-          `translate3d(${curX * -6}px, ${curY * -4 + breathY * 0.3}px, 0) ` +
-          `rotateY(${rotY}deg) rotateX(${rotX}deg) translateZ(${tz}px)`;
-        word.style.transform = `scale(${breathScale})`;
-      }
-      requestAnimationFrame(loop);
-    };
-    requestAnimationFrame(loop);
+    start();
   }
 </script>

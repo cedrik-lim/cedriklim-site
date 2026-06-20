@@ -332,6 +332,7 @@
       const img = document.createElement('img');
       img.className = 'newsfeed-thumb';
       img.decoding = 'async';
+      img.loading = 'lazy';
       img.src = item.faviconUrl;
       img.alt = '';
       img.onerror = () => { img.style.visibility = 'hidden'; };
@@ -415,7 +416,11 @@
     }
   };
 
-  load();
+  if ('requestIdleCallback' in window) {
+    (window as any).requestIdleCallback(load, { timeout: 2000 });
+  } else {
+    setTimeout(load, 200);
+  }
   refresh?.addEventListener('click', load);
 
   const feed   = document.querySelector<HTMLElement>('[data-newsfeed]');
