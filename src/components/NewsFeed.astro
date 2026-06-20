@@ -268,16 +268,16 @@
   const AI_KEYWORDS = /\b(AI|A\.I\.|AGI|ASI|LLM|LLMs|GPT|GPTs|ChatGPT|Claude|Anthropic|OpenAI|Gemini|DeepMind|DeepSeek|Mistral|Llama|Grok|RAG|MCP|fine[- ]?tuning|machine learning|deep learning|neural network|transformer|diffusion|generative|inference|embedding|prompt(?: engineering)?|reasoning model|agentic?|copilot|tokenization|nvidia|cuda|hugging[- ]?face|stable diffusion|midjourney|sora|dall-?e)\b/i;
 
   // Only stories from these domains (or their subdomains) appear in the feed.
+  // Paywalled outlets (WSJ, FT, NYT, Bloomberg, WaPo, Economist, New Yorker,
+  // Atlantic, The Information, Stratechery) are excluded.
   const TRUSTED = new Set([
-    // Major news
-    'nytimes.com', 'wsj.com', 'ft.com', 'bloomberg.com', 'reuters.com',
-    'bbc.com', 'bbc.co.uk', 'apnews.com', 'theguardian.com', 'economist.com',
-    'washingtonpost.com', 'theatlantic.com', 'newyorker.com',
+    // Major news (free / mostly free)
+    'bbc.com', 'bbc.co.uk', 'apnews.com', 'reuters.com', 'theguardian.com',
+    'npr.org', 'aljazeera.com', 'cbsnews.com', 'nbcnews.com', 'abcnews.go.com',
     // Tech press
     'techcrunch.com', 'theverge.com', 'arstechnica.com', 'wired.com',
     'cnbc.com', 'venturebeat.com', 'engadget.com', 'cnet.com', 'zdnet.com',
-    '404media.co', 'platformer.news', 'stratechery.com', 'theinformation.com',
-    'semafor.com', 'axios.com', 'vox.com',
+    '404media.co', 'semafor.com', 'axios.com', 'vox.com',
     // AI labs and big-tech blogs
     'openai.com', 'anthropic.com', 'deepmind.google', 'deepmind.com',
     'blog.google', 'ai.google', 'research.google', 'ai.googleblog.com',
