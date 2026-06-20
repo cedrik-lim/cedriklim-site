@@ -45,6 +45,7 @@ const COUNTRY_CODES: { code: string; flag: string; name: string }[] = [
   { code: '+54',  flag: '🇦🇷', name: 'Argentina' },
 ];
 ---
+<canvas class="reachout-confetti" data-reachout-confetti aria-hidden="true"></canvas>
 <div class="reachout-modal" data-reachout-modal hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="reachout-title">
   <div class="reachout-backdrop" data-reachout-close></div>
 
@@ -131,6 +132,15 @@ const COUNTRY_CODES: { code: string; flag: string; name: string }[] = [
 </div>
 
 <style>
+  .reachout-confetti {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100svh;
+    pointer-events: none;
+    z-index: 201;
+  }
+
   .reachout-modal {
     position: fixed;
     inset: 0;
@@ -476,10 +486,87 @@ const COUNTRY_CODES: { code: string; flag: string; name: string }[] = [
     modal.hidden = false;
     modal.setAttribute('aria-hidden', 'false');
     document.documentElement.style.overflow = 'hidden';
+    fireConfetti();
     setTimeout(() => {
       const firstInput = modal.querySelector<HTMLInputElement>('input[name="name"]');
       firstInput?.focus();
     }, 50);
+  };
+
+  // Tiny zero-dep confetti burst from the top of the viewport
+  const confettiCanvas = document.querySelector<HTMLCanvasElement>('[data-reachout-confetti]');
+  const COLORS = ['#ffd166', '#ef476f', '#06d6a0', '#118ab2', '#8338ec', '#fb5607'];
+  type Particle = { x: number; y: number; vx: number; vy: number; rot: number; vr: number; size: number; color: string; life: number; ttl: number; shape: 'rect' | 'circle' };
+  let particles: Particle[] = [];
+  let confettiRaf = 0;
+
+  const sizeCanvas = () => {
+    if (!confettiCanvas) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    confettiCanvas.width  = window.innerWidth  * dpr;
+    confettiCanvas.height = window.innerHeight * dpr;
+    confettiCanvas.style.width  = window.innerWidth + 'px';
+    confettiCanvas.style.height = window.innerHeight + 'px';
+    const ctx = confettiCanvas.getContext('2d');
+    ctx?.setTransform(dpr, 0, 0, dpr, 0, 0);
+  };
+  window.addEventListener('resize', sizeCanvas);
+
+  const fireConfetti = () => {
+    if (!confettiCanvas) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    sizeCanvas();
+    const W = window.innerWidth;
+    const burst = (originX: number) => {
+      for (let i = 0; i < 60; i++) {
+        const angle = -Math.PI / 2 + (Math.random() - 0.5) * (Math.PI * 0.9);
+        const speed = 7 + Math.random() * 9;
+        particles.push({
+          x: originX,
+          y: -10,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          rot: Math.random() * Math.PI * 2,
+          vr: (Math.random() - 0.5) * 0.4,
+          size: 6 + Math.random() * 6,
+          color: COLORS[(Math.random() * COLORS.length) | 0],
+          life: 0,
+          ttl: 90 + Math.random() * 50,
+          shape: Math.random() < 0.7 ? 'rect' : 'circle',
+        });
+      }
+    };
+    burst(W * 0.25);
+    burst(W * 0.5);
+    burst(W * 0.75);
+
+    cancelAnimationFrame(confettiRaf);
+    const ctx = confettiCanvas.getContext('2d');
+    if (!ctx) return;
+    const step = () => {
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      for (const p of particles) {
+        p.vy += 0.32;      // gravity
+        p.vx *= 0.995;     // drag
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vr;
+        p.life++;
+        const alpha = Math.max(0, 1 - p.life / p.ttl);
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        if (p.shape === 'rect') ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+        else { ctx.beginPath(); ctx.arc(0, 0, p.size / 2.4, 0, Math.PI * 2); ctx.fill(); }
+        ctx.restore();
+      }
+      particles = particles.filter((p) => p.life < p.ttl && p.y < window.innerHeight + 40);
+      if (particles.length) confettiRaf = requestAnimationFrame(step);
+      else ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    };
+    confettiRaf = requestAnimationFrame(step);
   };
   const close = () => {
     if (!modal) return;
