@@ -227,8 +227,28 @@
     flex-shrink: 0;
   }
 
-  @media (max-width: 900px) {
-    .newsfeed { display: none; }
+  @media (max-width: 640px) {
+    .newsfeed {
+      top: max(12px, env(safe-area-inset-top));
+      left: 12px;
+      right: auto;
+      bottom: auto;
+      width: max-content;
+      max-width: calc(100vw - 24px);
+    }
+    .newsfeed:not([data-collapsed]) {
+      width: calc(100vw - 88px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .newsfeed[data-hidden] {
+      opacity: 0 !important;
+      transform: translateY(-8px) !important;
+      pointer-events: none;
+      animation: none !important;
+    }
+    .newsfeed-list {
+      max-height: 50vh;
+    }
   }
 </style>
 
@@ -410,8 +430,23 @@
     try { localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '0'); } catch {}
   };
   try {
-    if (localStorage.getItem(STORAGE_KEY) === '1') setCollapsed(true);
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved === '1') setCollapsed(true);
+    else if (saved === null && window.matchMedia('(max-width: 640px)').matches) setCollapsed(true);
   } catch {}
+  if (window.matchMedia('(max-width: 640px)').matches) {
+    const hero = document.querySelector('[data-hero]');
+    if (hero && feed) {
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) feed.removeAttribute('data-hidden');
+          else feed.setAttribute('data-hidden', '');
+        }
+      }, { threshold: 0.25 });
+      io.observe(hero);
+    }
+  }
+
   const head = document.querySelector<HTMLElement>('[data-newsfeed-head]');
   head?.addEventListener('click', (e) => {
     if ((e.target as HTMLElement).closest('[data-newsfeed-refresh]')) return;
